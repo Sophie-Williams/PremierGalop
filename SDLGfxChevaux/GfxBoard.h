@@ -47,7 +47,7 @@ public:
 
 private:
 	bool LoadHorsesBitmap(char * file);
-	bool GfxBoard::BuildStartCaseBitmap();
+	bool BuildStartCaseBitmap();
 	bool BuildLadderCaseBitmap();
 	void DrawPixel(int x, int y, U8 R, U8 G, U8 B);
 	void ShowBMP(SDL_Surface* image,int x, int y);
@@ -63,7 +63,7 @@ private:
 	void blitBoxLabel(int horsesInTheBox, int iColor);
 
 	static TTF_Font * LoadFont(const char * file, int size);
-	static SDL_Surface * GfxBoard::LoadBitmap(char *file);
+	static SDL_Surface * LoadBitmap(char *file);
 
 private:
 	SDL_Surface *m_screen;

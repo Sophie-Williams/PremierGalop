@@ -521,51 +521,52 @@ bool GfxBoard::GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int 
 		if(m_pApp->waitEvent(event))
 		{
 			// Close window : exit
-			switch(event.type)
+			if(event.type == event.Closed)
 			{
-				case event.Closed:
-					m_pApp->close();
-					userEvent=CloseEvent;
-				case event.MouseButtonReleased:
+				m_pApp->close();
+				userEvent = CloseEvent;
+			}
+			else if(event.type == event.MouseButtonReleased)
+			{
+				LogicalLocalization logicLoc;
+				//TODO check if we need convert pixel coordinate to view coordinate
+				if(ConvertGfxToLogicalCoordinate(event.mouseButton.x, event.mouseButton.y, logicLoc))
 				{
-					LogicalLocalization logicLoc;
-					//TODO check if we need convert pixel coordinate to view coordinate
-					if(ConvertGfxToLogicalCoordinate(event.mouseButton.x, event.mouseButton.y, logicLoc))
+					//need to compute LogicalLocalization from position, then determine Horse number!
+					Case * pointedCase = GetCaseFromLocalization(logicLoc);
+					if(pointedCase!=NULL)
 					{
-						//need to compute LogicalLocalization from position, then determine Horse number!
-						Case * pointedCase = GetCaseFromLocalization(logicLoc);
-						if(pointedCase!=NULL)
+						Horse * pointedHorse = pointedCase->getHorse();
+						if(pointedHorse!=NULL)
 						{
-							Horse * pointedHorse = pointedCase->getHorse();
-							if(pointedHorse!=NULL)
-							{
-								nbPlayer = pointedHorse->getPlayer()->getPlayerNb();
-								nbHorse = pointedHorse->getHorseNumber();
-								userEvent = ClickedCase;
-							}
+							nbPlayer = pointedHorse->getPlayer()->getPlayerNb();
+							nbHorse = pointedHorse->getHorseNumber();
+							userEvent = ClickedCase;
 						}
 					}
-					else
-					{
-						userEvent = ClickedPanel;
-					}
 				}
-				case event.KeyPressed:
+				else
 				{
-					if(event.key.code >= sf::Keyboard::Num0 && event.key.code <= sf::Keyboard::Num9)
-					{
-						userEvent = HorseKey;
-						nbHorse=event.key.code - sf::Keyboard::Num0;
-					}
-					else if(event.key.code >= sf::Keyboard::Numpad0 && event.key.code <= sf::Keyboard::Numpad9)
-					{
-						userEvent = HorseKey;
-						nbHorse=event.key.code - sf::Keyboard::Numpad0;
-					}
+					userEvent = ClickedPanel;
 				}
-				break;
-				default:
-				break;
+			}
+			else if(event.type == event.KeyPressed)
+			{
+				if(event.key.code >= sf::Keyboard::Num0 && event.key.code <= sf::Keyboard::Num9)
+				{
+					userEvent = HorseKey;
+					nbHorse=event.key.code - sf::Keyboard::Num0;
+				}
+				else if(event.key.code >= sf::Keyboard::Numpad0 && event.key.code <= sf::Keyboard::Numpad9)
+				{
+					userEvent = HorseKey;
+					nbHorse=event.key.code - sf::Keyboard::Numpad0;
+				}
+				else if(event.key.code == sf::Keyboard::Q)
+				{
+					m_pApp->close();
+					userEvent = CloseEvent;
+				}
 			}
 		}
 	}
@@ -585,7 +586,7 @@ void GfxBoard::displayHistoric()
 			yMaxPos = *it2;
 		}
 		std::string strLegend = getPlayer(iPlayer)->getNickname() + " : " + getPlayer(iPlayer)->getTypeOfPlayer();
-		sf::Text str(strLegend);
+		sf::Text str(strLegend,*m_pFont,SMALL_FONT_SIZE);
 		str.setColor(*colors[iPlayer]);
 		str.setPosition(static_cast<float>(m_screensizeX-400),static_cast<float>(iPlayer*30));
 		m_pApp->draw(str);

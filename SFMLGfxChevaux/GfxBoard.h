@@ -42,7 +42,7 @@ public:
 
 private:
 	bool LoadHorsesBitmap(const char * file, std::size_t size);
-	bool GfxBoard::BuildStartCaseBitmap();
+	bool BuildStartCaseBitmap();
 	bool BuildLadderCaseBitmap();
 	bool ComputeGfxCoordinate();
 	bool ConvertLogicalToGfxCoordinate(LogicalLocalization &logicLoc, S32 &x, S32 &y, U16 &sizeX, U16 &sizeY);
