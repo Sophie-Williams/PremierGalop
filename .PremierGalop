@@ -1,0 +1,31 @@
+#######################################
+#     Premier Galop Configuration     #
+#######################################
+
+#ManualConfig = 0 (false) | 1 (true)
+ManualConfig = 0
+
+Topology = ../maps/classic4players.map
+
+#Ai_n possible values for player n:
+#  0 : All AI
+#  1 : Smart AI
+#  2 : One AI
+#  3 : Human AI
+
+#Nickname_n : nickname for player n
+
+AI_0 = 0
+Nickname_0 = All AI algo
+
+AI_1 = 1
+Nickname_1 = Smart AI algo
+
+AI_2 = 2
+Nickname_2 = One AI algo
+
+AI_3 = 3
+Nickname_3 = Marie
+
+# number of horses in the game
+NbHorses = 8

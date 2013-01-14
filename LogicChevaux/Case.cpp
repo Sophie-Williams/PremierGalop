@@ -1,0 +1,300 @@
+#include <cassert>
+#include "Case.h"
+#include "Horse.h"
+#include "Player.h"
+
+Case::Case(unsigned int x, unsigned int y, char caseValue)
+: m_logicalLocalization(x,y), m_pHorse(NULL), m_pNextCase(NULL),
+m_pNextLadderCase(NULL), m_caseValue(caseValue), m_ladderValue(0)
+{
+}
+
+Case::Case(const LogicalLocalization &localization, char caseValue)
+: m_logicalLocalization(localization), m_pHorse(NULL), m_pNextCase(NULL),
+m_pNextLadderCase(NULL), m_caseValue(caseValue), m_ladderValue(0)
+{
+}
+
+
+bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsigned int level)
+{
+	assert(horse!=NULL);
+	Horse* pHorseOnNextCase;
+	if(horse->isSleeping() && isAStartCaseForHorse(horse))
+	{
+		assert(level==0);
+		if(m_pHorse==NULL)
+		{//case is free (no horse on the case)
+			//return m_pNextCase->nbPossibleMove() + 1;
+			outputMoves[getLadderCaseValue()] = this;
+			return true;
+		}
+		else //there is a horse on the case
+		{
+			if(horse->haveSamePlayerOwner(m_pHorse))
+			{//return 0;//don't have the right to eliminate the horse of the same player
+				return true;
+			}
+			else
+			{//return 1;//have the right to eliminate the horse of the opponent!
+				outputMoves[getLadderCaseValue()] = this;
+				return true;
+			}
+		}
+	}
+	else if(isANormalCase() && !isALadderForPlayer(horse->getPlayer()))
+	{
+		assert(m_pNextCase!=NULL);
+		if(m_pNextCase!=NULL)
+		{
+			pHorseOnNextCase = m_pNextCase->getHorse();
+			if(pHorseOnNextCase==NULL)
+			{//case is free (no horse on the case)
+				//return m_pNextCase->nbPossibleMove() + 1;
+				outputMoves[level + 1] = m_pNextCase;
+				return m_pNextCase->getPossibleMoves(horse,outputMoves, level + 1);
+			}
+			else //there is a horse on the case
+			{
+				if(horse->haveSamePlayerOwner(pHorseOnNextCase))
+				{
+					//return 0;//don't have the right to eliminate the horse of the same player
+					return true;
+				}
+				else
+				{
+					//return 1;//have the right to eliminate the horse of the opponent!
+					outputMoves[level + 1] = m_pNextCase;
+					return true;
+				}
+			}
+		}
+		else
+		{//should not occurs, because there is always a successor to a normal case
+			return false;
+		}
+	}
+	else //if it is a ladder case or a base normal case of ladder
+	{
+		pHorseOnNextCase = m_pNextLadderCase->getHorse();
+		if(pHorseOnNextCase==NULL)
+		{//case is free (no horse on the case)
+			if(m_pNextLadderCase!=NULL)
+			{
+				//return m_pNextLadderCase->getLadderCaseValue();
+				if(outputMoves.size()==0)//ladder move is always unic, no other moves are possible!
+				{
+					outputMoves[m_pNextLadderCase->getLadderCaseValue()] = m_pNextLadderCase;
+				}
+				return true;
+			}
+			else
+			{
+				//return 0;//no more cases, after the finish case!
+				return true;
+			}
+		}
+		else //there is a horse on the case
+		{
+			if(pHorseOnNextCase->haveSamePlayerOwner(horse))
+			{
+				//return 0;//don't have the right to eliminate the horse of the same player
+				return true;
+			}
+			else
+			{//in the standard game, it is not possible to have opponent horses on the ladder
+				//return 1;//have the right to eliminate the horse of the opponent!
+				if(outputMoves.size()==0)//ladder move is always unic, no other moves are possible!
+				{
+					outputMoves[m_pNextLadderCase->getLadderCaseValue()] = m_pNextLadderCase;
+				}
+				return true;
+			}
+		}
+	}
+}
+
+bool Case::moveFrom(Case* pCaseSource, Horse* pHorse)
+{
+	assert((pCaseSource==NULL && pHorse!=NULL && pHorse->isSleeping())
+			|| (pCaseSource!=NULL));
+	assert(pHorse!=NULL || !pHorse->haveSamePlayerOwner(m_pHorse));//check if the player is an opponent!
+	if((pCaseSource != NULL && pCaseSource->getHorse() != NULL)
+		|| pHorse != NULL)
+	{
+		Horse* pHorseToMove;
+		if(pHorse != NULL)
+		{//Horse is currently not on the board (so not on a case), but in its rest box.
+			pHorseToMove = pHorse;
+		}
+		else
+		{//Horse is on the board
+			pHorseToMove = pCaseSource->getHorse();
+		}
+		if(m_pHorse!=NULL)//TODO
+		{
+			m_pHorse->returnToSleepingBox();
+		}
+		if(isAFinishCase())
+		{
+			pHorseToMove->setArrivedState();
+		}
+		else //it is not a finished case
+		{
+			setHorse(pHorseToMove);
+		}
+		if(pCaseSource!=NULL)
+		{
+			pCaseSource->setHorse(NULL);//remove horse from the previous case
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Case::appendBaseLadderForPlayer(Player* player)
+{
+	std::pair< std::set<Player *>::iterator, bool > pr = m_PlayerNumberBaseLadder.insert(player);
+	return pr.second;
+}
+
+bool Case::isALadderForPlayer(Player* pPlayer) const
+{
+	return m_PlayerNumberBaseLadder.find(pPlayer) != m_PlayerNumberBaseLadder.end();
+}
+
+bool Case::isAStartCaseForPlayer(Player* pPlayer) const
+{
+	if(pPlayer!=NULL)
+	{
+		return pPlayer->getPlayerId() == m_caseValue;
+	}
+	return false;
+}
+
+bool Case::isAStartCaseForHorse(Horse* pHorse) const
+{
+	if(pHorse!=NULL)
+	{
+		return isAStartCaseForPlayer(pHorse->getPlayer());
+	}
+	return false;
+}
+
+bool Case::isALadderForHorse(Horse* pHorse) const
+{
+	if(pHorse!=NULL)
+	{
+		return isALadderForPlayer(pHorse->getPlayer());
+	}
+	return false;
+}
+
+bool Case::copyLadderSet(const Case * sourceCase)
+{
+	if(sourceCase != NULL)
+	{
+		//m_PlayerNumberBaseLadder=sourceCase->m_PlayerNumberBaseLadder;
+		m_PlayerNumberBaseLadder.insert(sourceCase->m_PlayerNumberBaseLadder.begin(),
+										sourceCase->m_PlayerNumberBaseLadder.end());
+		return true;
+	}
+	return false;
+}
+
+bool Case::setNextCase(Case * caseToReference)
+{
+	m_pNextCase =  caseToReference;
+	return m_pNextCase!=NULL;
+}
+
+bool Case::setNextLadderCase(Case * caseToReference)
+{
+	m_pNextLadderCase = caseToReference;
+	return m_pNextLadderCase!=NULL;
+}
+
+bool Case::isALadderCase() {return isALadderCase(m_caseValue);}
+bool Case::isANormalCase() {return isANormalCase(m_caseValue);}
+bool Case::isAPureNormalCase() {return isAPureNormalCase(m_caseValue);}
+bool Case::isAStartCase() {return isAStartCase(m_caseValue);}
+bool Case::isABaseForLadder() {return isABaseForLadder(m_caseValue);}
+bool Case::isAFinishCase() {return isAFinishCase(m_caseValue);}
+bool Case::isAPureLadderCase() {return isAPureLadderCase(m_caseValue);}
+
+bool Case::isALadderCase(char charId)
+{
+	return (isAPureLadderCase(charId)
+		|| isAFinishCase(charId));
+}
+
+bool Case::isANormalCase(char charId)
+{
+	return isAPureNormalCase(charId)
+		|| isAStartCase(charId)
+		|| isABaseForLadder(charId);
+}
+
+bool Case::isAPureNormalCase(char charId)
+{
+	return (charId == '#');
+}
+
+bool Case::isAStartCase(char charId)
+{
+	return (charId >= 'a' && charId <= 'z');
+}
+
+bool Case::isABaseForLadder(char charId)
+{
+	return (charId >= 'A' && charId <= 'Z');
+}
+
+bool Case::isAPureLadderCase(char charId)
+{
+	return (charId == '=');
+}
+
+bool Case::isAFinishCase(char charId)
+{
+	return (charId == '$');
+}
+
+bool Case::isACase(char charId)
+{
+	return isANormalCase(charId)
+		|| isALadderCase(charId);
+}
+
+LogicalLocalization& Case::getLocalization()
+{
+	return m_logicalLocalization;
+}
+
+Horse * Case::getHorse()
+{
+	return m_pHorse;
+}
+
+void Case::setHorse(Horse* horse)
+{
+	m_pHorse = horse;
+	if(horse!=NULL)
+	{
+		horse->setCase(this);
+	}
+}
+
+unsigned int Case::getLadderCaseValue()
+{
+	return m_ladderValue;
+}
+
+void Case::setLadderCaseValue(unsigned int ladderValue)
+{
+	assert(isALadderCase() || isAStartCase());
+	m_ladderValue = ladderValue;
+}
