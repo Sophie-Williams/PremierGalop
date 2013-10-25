@@ -155,7 +155,7 @@ bool Board::BuildTopology(const LogicalLocalization &localization, tCaseId previ
 		assert(Case::isValidCaseId(previousCase));
 		if(Case::isValidCaseId(previousCase))
 		{
-			m_cases[previousCase.id].setNextCase(m_cases.front().getCaseId());//set last link of the normal case
+			getCase(previousCase).setNextCase(m_cases.front().getCaseId());//set last link of the normal case
 			return true;
 		}
 		else
@@ -183,7 +183,7 @@ bool Board::BuildTopology(const LogicalLocalization &localization, tCaseId previ
 			bool returnOfFirstBuildTopology = true;
 			if(Case::isValidCaseId(previousCase))
 			{
-				m_cases[previousCase.id].setNextCase(lastCase);
+				getCase(previousCase).setNextCase(lastCase);
 			}
 
 			if(Case::isAStartCase(caseID))//if(caseID >= 'a' && caseID <= 'z')
@@ -192,18 +192,18 @@ bool Board::BuildTopology(const LogicalLocalization &localization, tCaseId previ
 			}
 			else if(Case::isABaseForLadder(caseID))//if(caseID >= 'A' && caseID <= 'Z')
 			{
-				m_cases[lastCase.id].appendBaseLadderForPlayer(&m_players[getPlayerNumber(caseID)]);
+				getCase(lastCase).appendBaseLadderForPlayer(&m_players[getPlayerNumber(caseID)]);
 				//Build topology of the ladder
-				returnOfFirstBuildTopology = AnalyseAndChooseNextLocalization(true,m_cases[lastCase.id].getLocalization(),
-																					m_cases[previousCase.id].getLocalization(),
+				returnOfFirstBuildTopology = AnalyseAndChooseNextLocalization(true,getCase(lastCase).getLocalization(),
+																					getCase(previousCase).getLocalization(),
 																					newLocalization)
 											&& BuildTopology(newLocalization, lastCase);
 			}
 			
 			if(!Case::isValidCaseId(previousCase))
 			{//it means that there is no predecessor
-				return AnalyseAndChooseNextLocalization(false,m_cases[lastCase.id].getLocalization(),
-															m_cases[lastCase.id].getLocalization(),
+				return AnalyseAndChooseNextLocalization(false,getCase(lastCase).getLocalization(),
+															getCase(lastCase).getLocalization(),
 															newLocalization)
 											&& BuildTopology(newLocalization, lastCase);
 			}
@@ -211,8 +211,8 @@ bool Board::BuildTopology(const LogicalLocalization &localization, tCaseId previ
 			{
 				//Build Topology of the normal case
 				return returnOfFirstBuildTopology
-					&& AnalyseAndChooseNextLocalization(false,m_cases[lastCase.id].getLocalization(),
-															  m_cases[previousCase.id].getLocalization(),
+					&& AnalyseAndChooseNextLocalization(false,getCase(lastCase).getLocalization(),
+															  getCase(previousCase).getLocalization(),
 															  newLocalization)
 											&& BuildTopology(newLocalization, lastCase);
 			}
@@ -222,13 +222,13 @@ bool Board::BuildTopology(const LogicalLocalization &localization, tCaseId previ
 			assert(Case::isValidCaseId(previousCase));
 			if(Case::isValidCaseId(previousCase))
 			{
-				m_cases[previousCase.id].setNextLadderCase(lastCase);
-				m_cases[lastCase.id].setLadderCaseValue(m_cases[previousCase.id].getLadderCaseValue() + 1);//ladder value is incremented for the next ladder
+				getCase(previousCase).setNextLadderCase(lastCase);
+				getCase(lastCase).setLadderCaseValue(getCase(previousCase).getLadderCaseValue() + 1);//ladder value is incremented for the next ladder
 			}
-			m_cases[lastCase.id].copyLadderSet(previousCase);
+			getCase(lastCase).copyLadderSet(previousCase);
 			//Build Topology of the ladder
-			return AnalyseAndChooseNextLocalization(true,m_cases[lastCase.id].getLocalization(),
-														m_cases[previousCase.id].getLocalization(),
+			return AnalyseAndChooseNextLocalization(true,getCase(lastCase).getLocalization(),
+														getCase(previousCase).getLocalization(),
 														newLocalization)
 					&& BuildTopology(newLocalization, lastCase);
 		}
@@ -250,20 +250,20 @@ bool Board::BuildTopology(const LogicalLocalization &localization, tCaseId previ
 			assert(m_cases.back().getCaseId().id == (int)(m_cases.size() -1)); //just a sanity check
 			pEndCase.id = (int)m_cases.size();
 			m_cases.push_back(Case(this, localization, pEndCase,caseID));//the size gives the new id of the new case
-			m_cases[pEndCase.id].setLadderCaseValue(m_cases[previousCase.id].getLadderCaseValue());//keep the same ladder value
-			m_maxladderCaseValue = m_cases[previousCase.id].getLadderCaseValue();//in a standard game, 6 is the max value
+			getCase(pEndCase).setLadderCaseValue(getCase(previousCase).getLadderCaseValue());//keep the same ladder value
+			m_maxladderCaseValue = getCase(previousCase).getLadderCaseValue();//in a standard game, 6 is the max value
 		}
 		if(Case::isValidCaseId(previousCase))
 		{
 			for(tPlayerList::iterator itPlayers = m_players.begin(); itPlayers != m_players.end(); itPlayers++)
 			{
-				if(m_cases[previousCase.id].isALadderForPlayer(&(*itPlayers)))
+				if(getCase(previousCase).isALadderForPlayer(&(*itPlayers)))
 				{
 					m_endcases[itPlayers->getPlayerNb()]=pEndCase;
 				}
 			}
-			m_cases[pEndCase.id].copyLadderSet(previousCase);
-			m_cases[previousCase.id].setNextLadderCase(pEndCase);
+			getCase(pEndCase).copyLadderSet(previousCase);
+			getCase(previousCase).setNextLadderCase(pEndCase);
 		}
 		else
 		{
@@ -334,7 +334,7 @@ bool Board::PrepareStartCase()
 		{
 			if(Case::isValidCaseId(*itpCase))
 			{
-				m_cases[itpCase->id].setLadderCaseValue(m_maxladderCaseValue);
+				getCase(*itpCase).setLadderCaseValue(m_maxladderCaseValue);
 			}
 			else
 			{
@@ -442,7 +442,7 @@ bool Board::playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outp
 				
 				assert(Case::isValidCaseId(currentCase));
 				tMapDieNumberCase outputPossibleMoves;
-				if(m_cases[currentCase.id].getPossibleMoves(currentHorse, outputPossibleMoves))
+				if(getCase(currentCase).getPossibleMoves(currentHorse, outputPossibleMoves))
 				{
 					tMapDieNumberCase::const_iterator itDieNumberCase = outputPossibleMoves.find(outputDie);
 					if(itDieNumberCase!=outputPossibleMoves.end())
