@@ -8,7 +8,7 @@ class SmartHorseAIPlayerImpl :
 	public PlayerInterface
 {
 public:
-	SmartHorseAIPlayerImpl() : PlayerInterface("IA: chevaux intelligents") {};
+	SmartHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: chevaux intelligents", pBoard) {};
 	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
 };
 #endif

@@ -12,8 +12,8 @@
 
 typedef std::vector<std::string> tStringList;
 typedef std::vector<Case> tCaseList;
-typedef std::map<LogicalLocalization,Case*> tpCaseMap;
-typedef std::vector<Case*> tpCaseList;
+typedef std::map<LogicalLocalization,tCaseId> tpCaseMap;
+typedef std::vector<tCaseId> tpCaseList;
 typedef std::vector<Player> tPlayerList;
 typedef std::list<std::vector<int> > tHistoricList;
 
@@ -41,6 +41,7 @@ public:
 	unsigned int getNumberOfPlayers();
 	Player * getPlayer(unsigned int playerNumber);
 	unsigned int getMaxLadderCaseValue() const;
+	Case& getCase(tCaseId caseId);
 
 	unsigned int getMaxX();
 	unsigned int getMaxY();
@@ -50,11 +51,11 @@ public:
 	unsigned int launchDie();
 	static unsigned int launchDie(unsigned int maxValue);
 	unsigned int GetNumberOfHorsesByPLayer() const;
-	Case * GetCaseFromLocalization(const LogicalLocalization &logicLoc) const;
+	tCaseId GetCaseFromLocalization(const LogicalLocalization &logicLoc) const;
 	virtual bool GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int &nbPlayer);
 
 	bool playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outputMoves, unsigned int &outputDie);
-	bool playOneTurnResponse(Horse* horseToMove, Case* caseToReach, unsigned int inputDie, Player* &nextPlayer);
+	bool playOneTurnResponse(Horse* horseToMove, tCaseId caseToReach, unsigned int inputDie, Player* &nextPlayer);
 
 	static int GetHorseNumberInTheBox(tHorseTargetCaseList &horseList);
 	std::vector<int> getScores() const;
@@ -71,7 +72,7 @@ protected:
 
 private:
 	bool BuildPlayers(int nbPlayers);
-	bool BuildTopology(const LogicalLocalization &localization, Case * previousCase = NULL);
+	bool BuildTopology(const LogicalLocalization &localization, tCaseId previousCase = CASE_ID_UNKNOWN);
 	bool PrepareStartCase();
 	bool AnalyseAndChooseNextLocalization(bool expectingLadderCase,
 							   const LogicalLocalization &currentLocalization,

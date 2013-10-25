@@ -7,7 +7,7 @@ class OneHorseAIPlayerImpl :
 	public PlayerInterface
 {
 public:
-	OneHorseAIPlayerImpl() : PlayerInterface("IA: un cheval") {};
+	OneHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: un cheval", pBoard) {};
 	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
 };
 

@@ -285,25 +285,25 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 	tStringList displayTab(getMaxY(),std::string(getMaxX(),' '));
 	for(tpCaseList::iterator itCase=caseList.begin(); itCase != caseList.end(); itCase++)
 	{
-		Case * pItCase = *itCase;
-		LogicalLocalization loc = pItCase->getLocalization();
+		tCaseId pItCase = *itCase;
+		LogicalLocalization loc = getCase(pItCase).getLocalization();
 		if(bPartialUpdate)
 		{
 			FillRect(loc.getX()*m_gridCaseSizeX,loc.getY()*m_gridCaseSizeY
 				,m_gridCaseSizeX,m_gridCaseSizeY,0,0,0,255);//fill case with a black rectangle
 		}
 
-		Horse * horse = pItCase->getHorse();
+		Horse * horse = getCase(pItCase).getHorse();
 		SDL_Surface* image = NULL;
 		S32 offsetX = 0;
 		S32 offsetY = 0;
 
-		if(pItCase->isAStartCase())
+		if(getCase(pItCase).isAStartCase())
 		{
 			//c = '_';
 			for(tPlayerList::iterator itPlayer=this->getPlayersList().begin(); itPlayer!=this->getPlayersList().end(); itPlayer++)
 			{
-				if(pItCase->isAStartCaseForPlayer(&*itPlayer))
+				if(getCase(pItCase).isAStartCaseForPlayer(&*itPlayer))
 				{
 					image = m_startCaseImages[itPlayer->getPlayerNb()];
 					break;
@@ -313,26 +313,26 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 			offsetX = (m_gridCaseSizeX - image->w)/2;
 			offsetY = (m_gridCaseSizeY - image->h)/2;
 		}
-		else if(pItCase->isAPureLadderCase())
+		else if(getCase(pItCase).isAPureLadderCase())
 		{
 			//c = static_cast<char>('0' + itCase->getLadderCaseValue());
 			for(tPlayerList::iterator itPlayer=this->getPlayersList().begin(); itPlayer!=this->getPlayersList().end(); itPlayer++)
 			{
-				if(pItCase->isALadderForPlayer(&*itPlayer))
+				if(getCase(pItCase).isALadderForPlayer(&*itPlayer))
 				{
-					image = m_playerladderImages[itPlayer->getPlayerNb()][pItCase->getLadderCaseValue()-1];
+					image = m_playerladderImages[itPlayer->getPlayerNb()][getCase(pItCase).getLadderCaseValue()-1];
 					break;
 				}
 			}
 			offsetX = (m_gridCaseSizeX - image->w)/2;
 			offsetY = (m_gridCaseSizeY - image->h)/2;
 		}
-		else if(pItCase->isAFinishCase())
+		else if(getCase(pItCase).isAFinishCase())
 		{
 			//c = '$';
 			image = NULL;
 		}
-		else if(pItCase->isANormalCase())
+		else if(getCase(pItCase).isANormalCase())
 		{
 			//c = '.';
 			image = m_normalCaseImage;
@@ -362,7 +362,7 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 		if(horse!=NULL)
 		{
 			assert(horse->getPlayer()!=NULL);
-			assert(horse->getCase()!=NULL);
+			assert(Case::isValidCaseId(horse->getCase()));
 			//c = static_cast<char>('a' + horse->getPlayer()->getPlayerNb());
 			image = m_horseImages[horse->getPlayer()->getPlayerNb()];
 
@@ -596,10 +596,10 @@ bool GfxBoard::GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int 
 				if(ConvertGfxToLogicalCoordinate(test_event.button.x, test_event.button.y, logicLoc))
 				{
 					//need to compute LogicalLocalization from position, then determine Horse number!
-					Case * pointedCase = GetCaseFromLocalization(logicLoc);
-					if(pointedCase!=NULL)
+					tCaseId pointedCase = GetCaseFromLocalization(logicLoc);
+					if(Case::isValidCaseId(pointedCase))
 					{
-						Horse * pointedHorse = pointedCase->getHorse();
+						Horse * pointedHorse = getCase(pointedCase).getHorse();
 						if(pointedHorse!=NULL)
 						{
 							nbPlayer = pointedHorse->getPlayer()->getPlayerNb();

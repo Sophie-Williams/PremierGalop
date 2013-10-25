@@ -7,7 +7,7 @@ tHorseTargetCase SmartHorseAIPlayerImpl::ChooseMoveFrom(const tHorseTargetCaseLi
 	for(tHorseTargetCaseList::const_iterator it = listOfMoves.begin(); it != listOfMoves.end(); it++)
 	{
 		//urgence are always played in all cases. We must avoid the return to the sleeping box!
-		if(it->pTargetCase->isABaseForLadder() || it->pHorse->isRunningOnfirstCaseofLadderCase())
+		if(m_pBoard->getCase(it->pTargetCase).isABaseForLadder() || it->pHorse->isRunningOnfirstCaseofLadderCase())
 		{
 			return *it;
 		}

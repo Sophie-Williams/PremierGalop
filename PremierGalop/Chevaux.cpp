@@ -49,16 +49,16 @@ int main(int argc, char* argv[])
 	//return board.ReadBoardTopologyFromFile(reinterpret_cast<char*>(argv[1]));
 	if((result = board.ReadBoardTopologyFromFile(mapFile))==false)
 	{
-		cerr << "Can't open map file: " << DEFAULT_MAP_FILE << endl;
+		cerr << "Can't open map file: " << mapFile << endl;
 		return -1;
 	}
 	Player * pPlayer = board.getPlayer(0);//get first player
 	tPlayerInterfaceVector vectorOfAis;
-	AllHorseAIPlayerImpl allAI;
+	AllHorseAIPlayerImpl allAI(&board);
 	vectorOfAis.push_back(&allAI);
-	SmartHorseAIPlayerImpl smartAI;
+	SmartHorseAIPlayerImpl smartAI(&board);
 	vectorOfAis.push_back(&smartAI);
-	OneHorseAIPlayerImpl oneAI;
+	OneHorseAIPlayerImpl oneAI(&board);
 	vectorOfAis.push_back(&oneAI);
 	HumanPlayerImpl humanAI(&board);
 	vectorOfAis.push_back(&humanAI);
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
 			caseListwhichNeedGraphicalUpdate.clear();
 			if(horseTargetCaseList.size()>=1)
 			{//update graphic board when a horse is moved!
-				if(horseTargetCase.pHorse!=NULL && horseTargetCase.pTargetCase!=NULL)
+				if(horseTargetCase.pHorse!=NULL && Case::isValidCaseId(horseTargetCase.pTargetCase))
 				{
 					if(horseTargetCase.pHorse->isRunning())
 					{

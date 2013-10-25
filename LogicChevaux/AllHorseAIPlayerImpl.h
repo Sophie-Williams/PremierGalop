@@ -8,7 +8,7 @@ class AllHorseAIPlayerImpl :
 	public PlayerInterface
 {
 public:
-	AllHorseAIPlayerImpl() : PlayerInterface("IA: max chevaux") {};
+	AllHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: max chevaux", pBoard) {};
 	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
 };
 #endif

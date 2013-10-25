@@ -7,10 +7,12 @@
 class PlayerInterface
 {
 protected:
-	PlayerInterface(const std::string &sAiType) : m_sAiType(sAiType) {};
+	PlayerInterface(const std::string &sAiType, Board *pBoard) : m_sAiType(sAiType), m_pBoard(pBoard) {};
 public:
 	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves) = 0;
 	virtual std::string& getTypeOfPlayer() { return m_sAiType;};
+protected:
+	Board * m_pBoard;
 private:
 	std::string m_sAiType;
 };

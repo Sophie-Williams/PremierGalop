@@ -3,20 +3,21 @@
 
 #include <string>
 #include <vector>
-#include "Board.h"
+#include "types.h"
 #include "Horse.h"
 
 typedef char tPLayerId;
 typedef std::vector<Horse> tHorseList;
 
 class PlayerInterface;
+class Board;
 
 class Player
 {
 public:
 	Player(const std::string &nickname, tPLayerId playerId);
 
-	bool AddHorses(unsigned int nbHorses);
+	bool AddHorses(Board * pBoard, unsigned int nbHorses);
 	void setPlayerInterface(PlayerInterface *pPlayerInterface);
 
 	tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);

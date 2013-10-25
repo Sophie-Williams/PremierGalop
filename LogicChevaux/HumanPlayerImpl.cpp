@@ -12,7 +12,7 @@ tHorseTargetCase HumanPlayerImpl::ChooseMoveFrom(const tHorseTargetCaseList &lis
 		if(m_pBoard->GetChoiceFromEvents(userEvent, horseNb, playerNb) && userEvent!=CloseEvent)
 		{
 			horseTargetCase.pHorse=NULL;
-			horseTargetCase.pTargetCase=NULL;
+			horseTargetCase.pTargetCase=CASE_ID_UNKNOWN;
 			for(tHorseTargetCaseList::const_iterator it = listOfMoves.begin(); !bOK && it != listOfMoves.end(); it++)
 			{
 				/*if(it->pHorse->isSleeping())

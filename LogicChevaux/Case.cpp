@@ -2,21 +2,22 @@
 #include "Case.h"
 #include "Horse.h"
 #include "Player.h"
+#include "Board.h"
 
-Case::Case(unsigned int x, unsigned int y, char caseValue)
-: m_logicalLocalization(x,y), m_pHorse(NULL), m_pNextCase(NULL),
-m_pNextLadderCase(NULL), m_caseValue(caseValue), m_ladderValue(0)
+Case::Case(Board * pBoard, unsigned int x, unsigned int y,tCaseId id, char caseValue)
+: m_pBoard(pBoard), m_logicalLocalization(x,y), m_pHorse(NULL), m_pNextCase(CASE_ID_UNKNOWN),
+m_pNextLadderCase(CASE_ID_UNKNOWN), m_id(id), m_caseValue(caseValue), m_ladderValue(0)
 {
 }
 
-Case::Case(const LogicalLocalization &localization, char caseValue)
-: m_logicalLocalization(localization), m_pHorse(NULL), m_pNextCase(NULL),
-m_pNextLadderCase(NULL), m_caseValue(caseValue), m_ladderValue(0)
+Case::Case(Board * pBoard, const LogicalLocalization &localization, tCaseId id, char caseValue)
+: m_pBoard(pBoard), m_logicalLocalization(localization), m_pHorse(NULL), m_pNextCase(CASE_ID_UNKNOWN),
+m_pNextLadderCase(CASE_ID_UNKNOWN), m_id(id), m_caseValue(caseValue), m_ladderValue(0)
 {
 }
 
 
-bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsigned int level)
+bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsigned int level) const
 {
 	assert(horse!=NULL);
 	Horse* pHorseOnNextCase;
@@ -26,7 +27,7 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 		if(m_pHorse==NULL)
 		{//case is free (no horse on the case)
 			//return m_pNextCase->nbPossibleMove() + 1;
-			outputMoves[getLadderCaseValue()] = this;
+			outputMoves[getLadderCaseValue()] = this->getCaseId();
 			return true;
 		}
 		else //there is a horse on the case
@@ -37,22 +38,22 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 			}
 			else
 			{//return 1;//have the right to eliminate the horse of the opponent!
-				outputMoves[getLadderCaseValue()] = this;
+				outputMoves[getLadderCaseValue()] = this->getCaseId();
 				return true;
 			}
 		}
 	}
 	else if(isANormalCase() && !isALadderForPlayer(horse->getPlayer()))
 	{
-		assert(m_pNextCase!=NULL);
-		if(m_pNextCase!=NULL)
+		assert(Case::isValidCaseId(m_pNextCase));
+		if(Case::isValidCaseId(m_pNextCase))
 		{
-			pHorseOnNextCase = m_pNextCase->getHorse();
+			pHorseOnNextCase = m_pBoard->getCase(m_pNextCase).getHorse();
 			if(pHorseOnNextCase==NULL)
 			{//case is free (no horse on the case)
 				//return m_pNextCase->nbPossibleMove() + 1;
 				outputMoves[level + 1] = m_pNextCase;
-				return m_pNextCase->getPossibleMoves(horse,outputMoves, level + 1);
+				return m_pBoard->getCase(m_pNextCase).getPossibleMoves(horse,outputMoves, level + 1);
 			}
 			else //there is a horse on the case
 			{
@@ -76,15 +77,15 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 	}
 	else //if it is a ladder case or a base normal case of ladder
 	{
-		pHorseOnNextCase = m_pNextLadderCase->getHorse();
+		pHorseOnNextCase = m_pBoard->getCase(m_pNextLadderCase).getHorse();
 		if(pHorseOnNextCase==NULL)
 		{//case is free (no horse on the case)
-			if(m_pNextLadderCase!=NULL)
+			if(Case::isValidCaseId(m_pNextLadderCase))
 			{
 				//return m_pNextLadderCase->getLadderCaseValue();
 				if(outputMoves.size()==0)//ladder move is always unic, no other moves are possible!
 				{
-					outputMoves[m_pNextLadderCase->getLadderCaseValue()] = m_pNextLadderCase;
+					outputMoves[m_pBoard->getCase(m_pNextLadderCase).getLadderCaseValue()] = m_pNextLadderCase;
 				}
 				return true;
 			}
@@ -106,7 +107,7 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 				//return 1;//have the right to eliminate the horse of the opponent!
 				if(outputMoves.size()==0)//ladder move is always unic, no other moves are possible!
 				{
-					outputMoves[m_pNextLadderCase->getLadderCaseValue()] = m_pNextLadderCase;
+					outputMoves[m_pBoard->getCase(m_pNextLadderCase).getLadderCaseValue()] = m_pNextLadderCase;
 				}
 				return true;
 			}
@@ -114,12 +115,12 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 	}
 }
 
-bool Case::moveFrom(Case* pCaseSource, Horse* pHorse)
+bool Case::moveFrom(tCaseId pCaseSource, Horse* pHorse)
 {
-	assert((pCaseSource==NULL && pHorse!=NULL && pHorse->isSleeping())
-			|| (pCaseSource!=NULL));
+	assert((!Case::isValidCaseId(pCaseSource) && pHorse!=NULL && pHorse->isSleeping())
+		|| Case::isValidCaseId(pCaseSource));
 	assert(pHorse!=NULL || !pHorse->haveSamePlayerOwner(m_pHorse));//check if the player is an opponent!
-	if((pCaseSource != NULL && pCaseSource->getHorse() != NULL)
+	if((Case::isValidCaseId(pCaseSource) && m_pBoard->getCase(pCaseSource).getHorse() != NULL)
 		|| pHorse != NULL)
 	{
 		Horse* pHorseToMove;
@@ -129,7 +130,7 @@ bool Case::moveFrom(Case* pCaseSource, Horse* pHorse)
 		}
 		else
 		{//Horse is on the board
-			pHorseToMove = pCaseSource->getHorse();
+			pHorseToMove = m_pBoard->getCase(pCaseSource).getHorse();
 		}
 		if(m_pHorse!=NULL)//TODO
 		{
@@ -143,9 +144,9 @@ bool Case::moveFrom(Case* pCaseSource, Horse* pHorse)
 		{
 			setHorse(pHorseToMove);
 		}
-		if(pCaseSource!=NULL)
+		if(Case::isValidCaseId(pCaseSource))
 		{
-			pCaseSource->setHorse(NULL);//remove horse from the previous case
+			m_pBoard->getCase(pCaseSource).setHorse(NULL);//remove horse from the previous case
 		}
 		return true;
 	}
@@ -193,37 +194,37 @@ bool Case::isALadderForHorse(Horse* pHorse) const
 	return false;
 }
 
-bool Case::copyLadderSet(const Case * sourceCase)
+bool Case::copyLadderSet(const tCaseId sourceCase)
 {
-	if(sourceCase != NULL)
+	if(Case::isValidCaseId(sourceCase))
 	{
 		//m_PlayerNumberBaseLadder=sourceCase->m_PlayerNumberBaseLadder;
-		m_PlayerNumberBaseLadder.insert(sourceCase->m_PlayerNumberBaseLadder.begin(),
-										sourceCase->m_PlayerNumberBaseLadder.end());
+		m_PlayerNumberBaseLadder.insert(m_pBoard->getCase(sourceCase).m_PlayerNumberBaseLadder.begin(),
+										m_pBoard->getCase(sourceCase).m_PlayerNumberBaseLadder.end());
 		return true;
 	}
 	return false;
 }
 
-bool Case::setNextCase(Case * caseToReference)
+bool Case::setNextCase(tCaseId caseToReference)
 {
-	m_pNextCase =  caseToReference;
-	return m_pNextCase!=NULL;
+	m_pNextCase = caseToReference;
+	return Case::isValidCaseId(m_pNextCase);
 }
 
-bool Case::setNextLadderCase(Case * caseToReference)
+bool Case::setNextLadderCase(tCaseId caseToReference)
 {
 	m_pNextLadderCase = caseToReference;
-	return m_pNextLadderCase!=NULL;
+	return Case::isValidCaseId(m_pNextLadderCase);
 }
 
-bool Case::isALadderCase() {return isALadderCase(m_caseValue);}
-bool Case::isANormalCase() {return isANormalCase(m_caseValue);}
-bool Case::isAPureNormalCase() {return isAPureNormalCase(m_caseValue);}
-bool Case::isAStartCase() {return isAStartCase(m_caseValue);}
-bool Case::isABaseForLadder() {return isABaseForLadder(m_caseValue);}
-bool Case::isAFinishCase() {return isAFinishCase(m_caseValue);}
-bool Case::isAPureLadderCase() {return isAPureLadderCase(m_caseValue);}
+bool Case::isALadderCase() const {return isALadderCase(m_caseValue);}
+bool Case::isANormalCase() const{return isANormalCase(m_caseValue);}
+bool Case::isAPureNormalCase() const {return isAPureNormalCase(m_caseValue);}
+bool Case::isAStartCase() const {return isAStartCase(m_caseValue);}
+bool Case::isABaseForLadder() const {return isABaseForLadder(m_caseValue);}
+bool Case::isAFinishCase() const {return isAFinishCase(m_caseValue);}
+bool Case::isAPureLadderCase() const{return isAPureLadderCase(m_caseValue);}
 
 bool Case::isALadderCase(char charId)
 {
@@ -269,12 +270,12 @@ bool Case::isACase(char charId)
 		|| isALadderCase(charId);
 }
 
-LogicalLocalization& Case::getLocalization()
+const LogicalLocalization& Case::getLocalization() const
 {
 	return m_logicalLocalization;
 }
 
-Horse * Case::getHorse()
+Horse * Case::getHorse() const
 {
 	return m_pHorse;
 }
@@ -284,11 +285,11 @@ void Case::setHorse(Horse* horse)
 	m_pHorse = horse;
 	if(horse!=NULL)
 	{
-		horse->setCase(this);
+		horse->setCase(this->getCaseId());
 	}
 }
 
-unsigned int Case::getLadderCaseValue()
+unsigned int Case::getLadderCaseValue() const
 {
 	return m_ladderValue;
 }
@@ -297,4 +298,9 @@ void Case::setLadderCaseValue(unsigned int ladderValue)
 {
 	assert(isALadderCase() || isAStartCase());
 	m_ladderValue = ladderValue;
+}
+
+bool Case::isValidCaseId(tCaseId caseId)
+{
+	return caseId.id>=0;
 }

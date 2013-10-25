@@ -96,8 +96,8 @@ bool Board::ReadBoardTopologyFromTable(unsigned int maxLength)
 
 	int nbPlayers = getPlayerNumber( maxLetter) + 1;
 
-	m_startcases.resize(nbPlayers,NULL);
-	m_endcases.resize(nbPlayers,NULL);
+	m_startcases.resize(nbPlayers,CASE_ID_UNKNOWN);
+	m_endcases.resize(nbPlayers,CASE_ID_UNKNOWN);
 	m_cases.reserve(nbCases);//Very important, because we have reference on the internal elements.
 	//If capacity is too low, vector is auto-resized, and addresses of the internal elements changes!
 
@@ -130,6 +130,12 @@ char Board::getPlayerCapitalLetter(int playerNumber)
 	return static_cast<char> ('A' + playerNumber);
 }
 
+Case& Board::getCase(tCaseId caseId)
+{
+	assert(Case::isValidCaseId(caseId) && caseId.id<(int)m_cases.size());
+	return m_cases[caseId.id];
+}
+
 bool Board::BuildPlayers(int nbPlayers)
 {
 	char defaultNickname[]="a";
@@ -137,19 +143,19 @@ bool Board::BuildPlayers(int nbPlayers)
 	for(char i=0;i<nbPlayers;i++, defaultNickname[0]++)
 	{
 		m_players.push_back(Player(defaultNickname, defaultNickname[0]));
-		m_players.back().AddHorses(m_nbHorses);
+		m_players.back().AddHorses(this,m_nbHorses);
 	}
 	return true;
 }
 
-bool Board::BuildTopology(const LogicalLocalization &localization, Case * previousCase)
+bool Board::BuildTopology(const LogicalLocalization &localization, tCaseId previousCase)
 {
 	if(m_cases.size() > 0 && localization == m_cases.front().getLocalization())
 	{//it means that the build of the normal case is finished, cycle is reached!
-		assert(previousCase!=NULL);
-		if(previousCase!=NULL)
+		assert(Case::isValidCaseId(previousCase));
+		if(Case::isValidCaseId(previousCase))
 		{
-			previousCase->setNextCase(&m_cases.front());//set last link of the normal case
+			m_cases[previousCase.id].setNextCase(m_cases.front().getCaseId());//set last link of the normal case
 			return true;
 		}
 		else
@@ -167,17 +173,17 @@ bool Board::BuildTopology(const LogicalLocalization &localization, Case * previo
 		|| Case::isAPureLadderCase(caseID))
 	{
 		LogicalLocalization newLocalization;
-		m_cases.push_back(Case(localization, caseID));
-		m_casesLogicalMap.insert(tpCaseMap::value_type(localization,&m_cases.back()));
-		Case * lastCase = &m_cases.back();
+		tCaseId lastCase = {(int)m_cases.size()};
+		m_cases.push_back(Case(this,localization, lastCase, caseID));
+		m_casesLogicalMap.insert(tpCaseMap::value_type(localization,lastCase));
 
 		//if(caseID != '=' && caseID != '$')
 		if(Case::isANormalCase(caseID))
 		{
 			bool returnOfFirstBuildTopology = true;
-			if(previousCase!=NULL)
+			if(Case::isValidCaseId(previousCase))
 			{
-				previousCase->setNextCase(lastCase);
+				m_cases[previousCase.id].setNextCase(lastCase);
 			}
 
 			if(Case::isAStartCase(caseID))//if(caseID >= 'a' && caseID <= 'z')
@@ -186,77 +192,78 @@ bool Board::BuildTopology(const LogicalLocalization &localization, Case * previo
 			}
 			else if(Case::isABaseForLadder(caseID))//if(caseID >= 'A' && caseID <= 'Z')
 			{
-				lastCase->appendBaseLadderForPlayer(&m_players[getPlayerNumber(caseID)]);
+				m_cases[lastCase.id].appendBaseLadderForPlayer(&m_players[getPlayerNumber(caseID)]);
 				//Build topology of the ladder
-				returnOfFirstBuildTopology = AnalyseAndChooseNextLocalization(true,lastCase->getLocalization(),
-																					previousCase->getLocalization(),
+				returnOfFirstBuildTopology = AnalyseAndChooseNextLocalization(true,m_cases[lastCase.id].getLocalization(),
+																					m_cases[previousCase.id].getLocalization(),
 																					newLocalization)
 											&& BuildTopology(newLocalization, lastCase);
 			}
 			
-			if(previousCase==NULL)
+			if(!Case::isValidCaseId(previousCase))
 			{//it means that there is no predecessor
-				return AnalyseAndChooseNextLocalization(false,lastCase->getLocalization(),
-															  lastCase->getLocalization(),
-															  newLocalization)
-					&& BuildTopology(newLocalization, lastCase);
+				return AnalyseAndChooseNextLocalization(false,m_cases[lastCase.id].getLocalization(),
+															m_cases[lastCase.id].getLocalization(),
+															newLocalization)
+											&& BuildTopology(newLocalization, lastCase);
 			}
 			else
 			{
 				//Build Topology of the normal case
 				return returnOfFirstBuildTopology
-					&& AnalyseAndChooseNextLocalization(false,lastCase->getLocalization(),
-															  previousCase->getLocalization(),
+					&& AnalyseAndChooseNextLocalization(false,m_cases[lastCase.id].getLocalization(),
+															  m_cases[previousCase.id].getLocalization(),
 															  newLocalization)
-					&& BuildTopology(newLocalization, lastCase);
+											&& BuildTopology(newLocalization, lastCase);
 			}
 		}
 		else //if(Case::isAPureLadderCase()) // if(caseID == '=')
 		{
-			assert(previousCase!=NULL);
-			if(previousCase!=NULL)
+			assert(Case::isValidCaseId(previousCase));
+			if(Case::isValidCaseId(previousCase))
 			{
-				previousCase->setNextLadderCase(lastCase);
-				lastCase->setLadderCaseValue(previousCase->getLadderCaseValue() + 1);//ladder value is incremented for the next ladder
+				m_cases[previousCase.id].setNextLadderCase(lastCase);
+				m_cases[lastCase.id].setLadderCaseValue(m_cases[previousCase.id].getLadderCaseValue() + 1);//ladder value is incremented for the next ladder
 			}
-			lastCase->copyLadderSet(previousCase);
+			m_cases[lastCase.id].copyLadderSet(previousCase);
 			//Build Topology of the ladder
-			return AnalyseAndChooseNextLocalization(true,lastCase->getLocalization(),
-														previousCase->getLocalization(),
+			return AnalyseAndChooseNextLocalization(true,m_cases[lastCase.id].getLocalization(),
+														m_cases[previousCase.id].getLocalization(),
 														newLocalization)
-				&& BuildTopology(newLocalization, lastCase);
+					&& BuildTopology(newLocalization, lastCase);
 		}
 	}
 	else if (Case::isAFinishCase(caseID)) //(caseID == '$')
 	{
-		Case* pEndCase = NULL;
+		tCaseId pEndCase = CASE_ID_UNKNOWN;
 		//first we must know if the final case already exist (only one final case is authorized).
-		for(std::vector<Case *>::iterator itCases=m_endcases.begin(); itCases!= m_endcases.end(); itCases++)
+		for(tpCaseList::iterator itCases=m_endcases.begin(); itCases!= m_endcases.end(); itCases++)
 		{
-			if(*itCases!=NULL)
+			if(Case::isValidCaseId(*itCases))
 			{
 				pEndCase = *itCases;
 				break;
 			}
 		}
-		if(pEndCase == NULL)
+		if(!Case::isValidCaseId(pEndCase))
 		{//if the final case doesn't exists, we create a new one!
-			m_cases.push_back(Case(localization, caseID));
-			pEndCase = &m_cases.back();
-			pEndCase->setLadderCaseValue(previousCase->getLadderCaseValue());//keep the same ladder value
-			m_maxladderCaseValue = previousCase->getLadderCaseValue();//in a standard game, 6 is the max value
+			assert(m_cases.back().getCaseId().id == (int)(m_cases.size() -1)); //just a sanity check
+			pEndCase.id = (int)m_cases.size();
+			m_cases.push_back(Case(this, localization, pEndCase,caseID));//the size gives the new id of the new case
+			m_cases[pEndCase.id].setLadderCaseValue(m_cases[previousCase.id].getLadderCaseValue());//keep the same ladder value
+			m_maxladderCaseValue = m_cases[previousCase.id].getLadderCaseValue();//in a standard game, 6 is the max value
 		}
-		if(previousCase!=NULL)
+		if(Case::isValidCaseId(previousCase))
 		{
-			for(std::vector<Player>::iterator itPlayers = m_players.begin(); itPlayers != m_players.end(); itPlayers++)
+			for(tPlayerList::iterator itPlayers = m_players.begin(); itPlayers != m_players.end(); itPlayers++)
 			{
-				if(previousCase->isALadderForPlayer(&(*itPlayers)))
+				if(m_cases[previousCase.id].isALadderForPlayer(&(*itPlayers)))
 				{
-					m_endcases[itPlayers->getPlayerNb()]=pEndCase;	
+					m_endcases[itPlayers->getPlayerNb()]=pEndCase;
 				}
 			}
-			pEndCase->copyLadderSet(previousCase);
-			previousCase->setNextLadderCase(pEndCase);
+			m_cases[pEndCase.id].copyLadderSet(previousCase);
+			m_cases[previousCase.id].setNextLadderCase(pEndCase);
 		}
 		else
 		{
@@ -325,13 +332,13 @@ bool Board::PrepareStartCase()
 	{
 		for(tpCaseList::iterator itpCase = m_startcases.begin(); itpCase != m_startcases.end(); itpCase++)
 		{
-			if(*itpCase!=NULL)
+			if(Case::isValidCaseId(*itpCase))
 			{
-				(*itpCase)->setLadderCaseValue(m_maxladderCaseValue);
+				m_cases[itpCase->id].setLadderCaseValue(m_maxladderCaseValue);
 			}
 			else
 			{
-				assert(*itpCase!=NULL);
+				assert(Case::isValidCaseId(*itpCase));
 				return false;
 			}
 		}
@@ -384,7 +391,7 @@ bool Board::displayBoard()
 		else
 		{
 			assert(horse->getPlayer()!=NULL);
-			assert(horse->getCase()!=NULL);
+			assert(Case::isValidCaseId(horse->getCase()));
 			c = static_cast<char>('a' + horse->getPlayer()->getPlayerNb());
 		}
 		displayTab[loc.getY()][loc.getX()]=c;
@@ -425,7 +432,7 @@ bool Board::playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outp
 			assert(currentHorse!=NULL);
 			if(currentHorse!=NULL)
 			{
-				Case * currentCase = NULL;
+				tCaseId currentCase = CASE_ID_UNKNOWN;
 				if(currentHorse->isRunning())
 					currentCase = currentHorse->getCase();
 				else if(currentHorse->isSleeping())
@@ -433,9 +440,9 @@ bool Board::playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outp
 				else
 					continue;
 				
-				assert(currentCase!=NULL);
+				assert(Case::isValidCaseId(currentCase));
 				tMapDieNumberCase outputPossibleMoves;
-				if(currentCase->getPossibleMoves(currentHorse, outputPossibleMoves))
+				if(m_cases[currentCase.id].getPossibleMoves(currentHorse, outputPossibleMoves))
 				{
 					tMapDieNumberCase::const_iterator itDieNumberCase = outputPossibleMoves.find(outputDie);
 					if(itDieNumberCase!=outputPossibleMoves.end())
@@ -453,7 +460,7 @@ bool Board::playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outp
 	return false;
 }
 
-bool Board::playOneTurnResponse(Horse* horseToMove, Case* caseToReach, unsigned int inputDie, Player* &nextPlayer)
+bool Board::playOneTurnResponse(Horse* horseToMove, tCaseId caseToReach, unsigned int inputDie, Player* &nextPlayer)
 {
 	bool bStatus = true;
 	if(horseToMove!=NULL)
@@ -463,9 +470,9 @@ bool Board::playOneTurnResponse(Horse* horseToMove, Case* caseToReach, unsigned 
 		{
 			bStatus = getNextPlayer(nextPlayer);
 		}
-		if(bStatus && caseToReach!=NULL)
+		if(bStatus && Case::isValidCaseId(caseToReach))
 		{//chosen move (or only one possibilty)
-			caseToReach->moveFrom(horseToMove->getCase(),horseToMove);
+			getCase(caseToReach).moveFrom(horseToMove->getCase(),horseToMove);
 		}
 		//else no moves are possible!
 	}
@@ -521,7 +528,7 @@ void Board::getpCasesList(tpCaseList &caseListToFill)
 {
 	for(tCaseList::iterator it=m_cases.begin(); it != m_cases.end(); it++)
 	{
-		caseListToFill.push_back(&*it);
+		caseListToFill.push_back(it->getCaseId());
 	}
 }
 
@@ -530,13 +537,13 @@ tPlayerList& Board::getPlayersList()
 	return m_players;
 }
 
-Case * Board::GetCaseFromLocalization(const LogicalLocalization &logicLoc) const
+tCaseId Board::GetCaseFromLocalization(const LogicalLocalization &logicLoc) const
 {
 	tpCaseMap::const_iterator itLogicalLocCase = m_casesLogicalMap.find(logicLoc);
 	if(itLogicalLocCase != m_casesLogicalMap.end())
 		return itLogicalLocCase->second;
 	else
-		return NULL;
+		return CASE_ID_UNKNOWN;
 }
 
 bool Board::GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int &nbPlayer)

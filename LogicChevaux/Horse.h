@@ -1,17 +1,18 @@
 #ifndef  __CHEVAUX_HORSE_H__
 #define __CHEVAUX_HORSE_H__
 
+#include "Case.h"
+
 class Player;
-class Case;
 
 class Horse
 {
 public:
-	Horse(Player * player);
+	Horse(Board * pBoard, Player * player);
 	Player * getPlayer() const;
-	Case * getCase() const;
+	tCaseId getCase() const;
 	unsigned int getHorseNumber() const;
-	void setCase(Case* pCaseToSet);
+	void setCase(tCaseId pCaseToSet);
 	bool haveSamePlayerOwner(const Horse *horse) const;
 
 	bool isSleeping() const;
@@ -32,10 +33,11 @@ public:
 
 private:
 	Player * m_pPlayer;
-	Case * m_pCase;
+	tCaseId m_pCase;
 	bool m_bIsArrived;
 
 	int m_score;
+	Board * m_pBoard;
 };
 
 #endif

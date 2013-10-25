@@ -11,13 +11,14 @@ typedef signed long S32;
 
 //The following types are used in many header files, but they don't need the definition of classes (because of pointer usage)
 #include <list>
+
+#include "Case.h"
 class Horse;
-class Case;
 
 typedef struct
 {
 	Horse * pHorse;
-	Case * pTargetCase;
+	tCaseId pTargetCase;
 } tHorseTargetCase;
 
 typedef std::list<tHorseTargetCase> tHorseTargetCaseList;

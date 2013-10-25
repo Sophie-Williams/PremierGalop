@@ -332,7 +332,7 @@ bool GfxBoard::displayBoard()
 		if(horse!=NULL)
 		{
 			assert(horse->getPlayer()!=NULL);
-			assert(horse->getCase()!=NULL);
+			assert(Case::isValidCaseId(horse->getCase()));
 			//c = static_cast<char>('a' + horse->getPlayer()->getPlayerNb());
 			pSprite = m_horseSprites[horse->getPlayer()->getPlayerNb()];
 
@@ -533,10 +533,10 @@ bool GfxBoard::GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int 
 				if(ConvertGfxToLogicalCoordinate(event.mouseButton.x, event.mouseButton.y, logicLoc))
 				{
 					//need to compute LogicalLocalization from position, then determine Horse number!
-					Case * pointedCase = GetCaseFromLocalization(logicLoc);
-					if(pointedCase!=NULL)
+					tCaseId pointedCase = GetCaseFromLocalization(logicLoc);
+					if(Case::isValidCaseId(pointedCase))
 					{
-						Horse * pointedHorse = pointedCase->getHorse();
+						Horse * pointedHorse = getCase(pointedCase).getHorse();
 						if(pointedHorse!=NULL)
 						{
 							nbPlayer = pointedHorse->getPlayer()->getPlayerNb();

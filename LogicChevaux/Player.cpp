@@ -7,11 +7,12 @@ Player::Player(const std::string &nickname, tPLayerId playerId)
 : m_nickname(nickname), m_playerId(playerId), m_pPlayerInterface(NULL)
 {}
 
-bool Player::AddHorses(unsigned int nbHorses)
+bool Player::AddHorses(Board * pBoard, unsigned int nbHorses)
 {
+	assert(pBoard!=NULL);
 	for(unsigned int i=0; i<nbHorses; i++)
 	{
-		m_horses.push_back(Horse(this));
+		m_horses.push_back(Horse(pBoard, this));
 	}
 	return true;
 }
