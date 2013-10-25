@@ -24,32 +24,14 @@ add_subdirectory(LogicChevaux)
 if(${BUILD_SDL_SUPPORT})
 	set (SUFFIX_LIB "SDL")
 	message ( STATUS "SDLGfxChevaux" )
-	# add the subdirectories
+
 	add_subdirectory(SDLGfxChevaux)
 elseif(${BUILD_SFML_SUPPORT})
 	set (SUFFIX_LIB "SFML")
 	message ( STATUS "SFMLGfxChevaux" )
-	# # add the SFML header path
-	# set(SFML_PATH "${CMAKE_CURRENT_SOURCE_DIR}/SFML")
-
-	# # add the SFML header path
-	# include_directories(${SFML_PATH}/include)
 	
 	add_subdirectory("SFML")
-	
-	# add the subdirectories
-	add_subdirectory(SFMLGfxChevaux)
-	
-	# add_library(generator IMPORTED)                                                     # 1
-	# set_property(TARGET generator PROPERTY IMPORTED_LOCATION "/path/to/some_generator")    # 2
-
-	# set(GENERATED_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated.c)
-	# add_custom_command(
-	# OUTPUT ${GENERATED_SRC}
-	# COMMAND generator ${GENERATED_SRC}                                                   # 3
-	# )
-	
-	# add_executable(PremierGalop-SFMLExe src1.c src2.c ${GENERATED_SRC})
+	add_subdirectory(SFMLGfxChevaux)	
 else ()
 	message ( FATAL_ERROR "You must select SDL or SFML!!!" )
 endif ()
@@ -63,8 +45,8 @@ set(CPACK_PACKAGE_VENDOR "Christian FOUCHER")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "PremierGalop - Strategy horse board game")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "1")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_VERSION_MINOR "2")
+set(CPACK_PACKAGE_VERSION_PATCH "1")
 set(CPACK_PACKAGE_VERSION "${SUFFIX_LIB}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "PremierGalop")
 set(CPACK_PACKAGE_EXECUTABLES "PremierGalop" "Premier Galop")
