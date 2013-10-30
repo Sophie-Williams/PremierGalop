@@ -562,7 +562,7 @@ bool GfxBoard::GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int 
 					userEvent = HorseKey;
 					nbHorse=event.key.code - sf::Keyboard::Numpad0;
 				}
-				else if(event.key.code == sf::Keyboard::Q)
+				else if(event.key.code == sf::Keyboard::Escape)
 				{
 					m_pApp->close();
 					userEvent = CloseEvent;

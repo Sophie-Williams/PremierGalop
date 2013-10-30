@@ -176,6 +176,10 @@ int main(int argc, char* argv[])
 				cout << "Le jeu est fini!" << endl;
 				board.displayHistoric();
 			}
+			else
+			{
+				result = !pPlayer->isExitRequested();
+			}
 		}
 	}
 	return result;

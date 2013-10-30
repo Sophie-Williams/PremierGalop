@@ -34,11 +34,14 @@ public:
 	bool hasAlreadyWon();
 	int getScore() const;
 
+	inline bool isExitRequested() {return m_exitRequest;};
+
 private:
 	tHorseList m_horses;
 	tPLayerId m_playerId;
 	std::string m_nickname;
 	PlayerInterface * m_pPlayerInterface;//Pointer is necessary, in order to prevent truncation.
+	bool m_exitRequest;
 };
 
 #endif

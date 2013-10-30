@@ -55,6 +55,7 @@ tHorseTargetCase HumanPlayerImpl::ChooseMoveFrom(const tHorseTargetCaseList &lis
 		{
 			if(userEvent==CloseEvent)
 			{
+				horseTargetCase = ASK_QUIT;
 				bOK = true;
 			}
 		}

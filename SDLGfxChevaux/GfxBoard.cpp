@@ -657,6 +657,9 @@ bool GfxBoard::GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int 
 				case SDLK_KP9:
 					userEvent = HorseKey; nbHorse=9;
 				break;
+				case SDLK_ESCAPE:
+					userEvent = CloseEvent;
+				break;
 				default:
 				break;
 			}

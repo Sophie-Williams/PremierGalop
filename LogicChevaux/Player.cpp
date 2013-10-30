@@ -4,7 +4,7 @@
 #include "PlayerInterface.h"
 
 Player::Player(const std::string &nickname, tPLayerId playerId)
-: m_nickname(nickname), m_playerId(playerId), m_pPlayerInterface(NULL)
+: m_nickname(nickname), m_playerId(playerId), m_pPlayerInterface(NULL), m_exitRequest(false)
 {}
 
 bool Player::AddHorses(Board * pBoard, unsigned int nbHorses)
@@ -24,8 +24,12 @@ void Player::setPlayerInterface(PlayerInterface *pPlayerInterface)
 
 tHorseTargetCase Player::ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves)
 {
+	tHorseTargetCase htc;
 	assert(m_pPlayerInterface!=NULL);
-	return m_pPlayerInterface->ChooseMoveFrom(listOfMoves);
+	htc = m_pPlayerInterface->ChooseMoveFrom(listOfMoves);
+	if(mHorseTargetCaseEquals(htc,ASK_QUIT))
+		m_exitRequest = true;
+	return htc;
 }
 
 std::string Player::getTypeOfPlayer()
