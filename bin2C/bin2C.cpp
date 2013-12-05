@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 			while(inputStream.good() && !inputStream.eof())
 			{
 				inputStream.read(buffer,sizeof(buffer));
-				int nbReadBytes = inputStream.gcount();
+				std::streamsize nbReadBytes = inputStream.gcount();
 				for(int i=0; i < nbReadBytes; i++)
 				{
 					outputStream << "\t'\\x" << std::setw(2) << std::setfill('0') << (static_cast<unsigned int>(buffer[i]) & 0xFF) << "'," << std::endl;

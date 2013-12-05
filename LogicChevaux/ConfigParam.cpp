@@ -92,6 +92,22 @@ bool ConfigParam::loadConfigFromFile(const std::string &fileToOpen)
 	return false;
 }
 
+bool ConfigParam::saveConfigToFile(const std::string &outputFile)
+{
+	//write file line by line
+	std::ofstream configFile(outputFile.c_str());
+	if(!configFile.fail() && configFile.good())
+	{
+		for(tMapStringString::iterator it=m_dico.begin();it!=m_dico.end();it++)
+		{
+			configFile << it->first << "=" << it->second;
+		}
+		return true;
+	}
+	//close the file
+	return false;
+}
+
 bool ConfigParam::getStrValue(const std::string &keyStr, std::string &outputStr)
 {
 	tMapStringString::iterator it =  m_dico.find(keyStr);
