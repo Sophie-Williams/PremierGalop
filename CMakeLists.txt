@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 # set a default build type if none was provided
 # this has to be done before the project() instruction!
@@ -46,7 +46,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "PremierGalop - Strategy horse board game"
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "2")
-set(CPACK_PACKAGE_VERSION_PATCH "2")
+set(CPACK_PACKAGE_VERSION_PATCH "3")
 set(CPACK_PACKAGE_VERSION "${SUFFIX_LIB}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "PremierGalop")
 set(CPACK_PACKAGE_EXECUTABLES "PremierGalop" "Premier Galop")
@@ -64,12 +64,12 @@ SET(CPACK_NSIS_MENU_LINKS
   
 #SET(CPACK_NSIS_CREATE_ICONS_EXTRA)
   
-SET(CPACK_NSIS_MUI_ICON "@PROJECT_SOURCE_DIR@/gfx/RedHorse.ico")
+SET(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/gfx/RedHorse.ico")
 
-SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\gfx\\\\PremierGalopCapture.bmp" )
+# SET(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/gfx/PremierGalopCapture.bmp" )
 
 # Use the icond from cmake-gui for add-remove programs
-SET(CPACK_NSIS_INSTALLED_ICON_NAME "${CMAKE_CURRENT_SOURCE_DIR}\\\\gfx\\\\RedHorse.ico")
+SET(CPACK_NSIS_INSTALLED_ICON_NAME "${CMAKE_CURRENT_SOURCE_DIR}/gfx/RedHorse.ico")
 
 set(CPACK_COMPONENT_APPLICATION_DISPLAY_NAME "MyLib Application")
 set(CPACK_COMPONENT_BIN_DISPLAY_NAME "Premier Galop Application")
