@@ -7,7 +7,9 @@
 #include "Board.h"
 #include "LogicalLocalization.h"
 	
-struct SDL_Surface;
+struct SDL_Window;
+struct SDL_Texture;
+struct SDL_Renderer;
 typedef struct _TTF_Font TTF_Font;
 
 typedef enum 
@@ -31,8 +33,10 @@ static char *gfxHorseFiles[]=
 	"../gfx/YellowHorse.png"
 };
 
-typedef std::vector<SDL_Surface*> tpSurfaceList;
-typedef std::vector<tpSurfaceList> tpSurfaceListList;
+typedef std::vector<SDL_Texture*> tpTextureList;
+typedef std::vector<tpTextureList> tpTextureListList;
+
+typedef struct {int w; int h;} tSize;
 
 class GfxBoard : public Board
 {
@@ -46,12 +50,13 @@ public:
 	virtual bool GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int &nbPlayer);
 
 private:
+	void InitSidePanel();
 	bool LoadHorsesBitmap(char * file);
+	SDL_Texture * LoadTexture(char *file);
 	bool BuildStartCaseBitmap();
 	bool BuildLadderCaseBitmap();
-	void DrawPixel(int x, int y, U8 R, U8 G, U8 B);
-	void ShowBMP(SDL_Surface* image,int x, int y);
-	void FillRect(U16 x, U16 y, U16 sizeX, U16 sizeY, U8 R, U8 G, U8 B, U8 A);
+	//void DrawPixel(int x, int y, U8 R, U8 G, U8 B);
+	void ShowBMP(SDL_Texture* image,int x, int y);
 	bool ComputeGfxCoordinate();
 	bool ConvertLogicalToGfxCoordinate(LogicalLocalization &logicLoc, S32 &x, S32 &y, U16 &sizeX, U16 &sizeY);
 	bool ConvertGfxToLogicalCoordinate(S32 x, S32 y, LogicalLocalization &logicLoc);
@@ -63,20 +68,32 @@ private:
 	void blitBoxLabel(int horsesInTheBox, int iColor);
 
 	static TTF_Font * LoadFont(const char * file, int size);
-	static SDL_Surface * LoadBitmap(char *file);
+
+	int getTextureW(SDL_Texture *pTexture);
+	int getTextureH(SDL_Texture *pTexture);
 
 private:
-	SDL_Surface *m_screen;
-	tpSurfaceList m_horseImages;
-	SDL_Surface *m_normalCaseImage;
-	tpSurfaceList m_startCaseImages;
-	tpSurfaceListList m_playerladderImages;
+	SDL_Window *m_wnd;
+	SDL_Renderer *m_renderer;
+	tpTextureList m_horseImages;
+	SDL_Texture *m_normalCaseImage;
+	tpTextureList m_startCaseImages;
+	tpTextureListList m_playerladderImages;
+
+	SDL_Texture * m_HumanPanelTexture;
+	SDL_Texture * m_NickPanelTexture;
+	SDL_Texture * m_DiePanelTexture;
+	SDL_Texture * m_ScorePanelTexture;
+	SDL_Texture * m_BoxPanelTexture;
+
 	TTF_Font *m_pFont;
 	TTF_Font *m_pLittleFont;
-	U16 m_screensizeX;
+	U16 m_screensizeX; //TODO : change to tSize!!!!
 	U16 m_screensizeY;
-	U16 m_gridCaseSizeX;
+	U16 m_gridCaseSizeX;//TODO : change to tSize!!!!
 	U16 m_gridCaseSizeY;
+
+	int m_sidePanelPositionX;
 };
 
 #endif
