@@ -1,4 +1,4 @@
-// Chevaux.cpp : définit le point d'entrée pour l'application console.
+// Chevaux.cpp: dÃ©finit le point d'entrÃ©e pour l'application console.
 //
 #include <iostream>
 #include <fstream>
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
 				}
 				if(bAllMovableHorsesAreSleepingInTheBox)
 				{
-					//cout << "Joueur <<" << pPlayer->getNickname() << ">>. Tout vos chevaux deplacables sont aux écuries, je vais donc choisir le premier d'entre eux!" << endl;
+					//cout << "Joueur <<" << pPlayer->getNickname() << ">>. Tout vos chevaux deplacables sont aux Ã©curies, je vais donc choisir le premier d'entre eux!" << endl;
 					horseTargetCase = horseTargetCaseList.front();
 				}
 				else

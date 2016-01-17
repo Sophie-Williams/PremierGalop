@@ -17,15 +17,15 @@ typedef enum
 	red, green, blue, yellow
 } tPlayerColor;
 
-static char gfxfontFile[] = "../gfx/LiberationSansNarrow-Bold.ttf";
+const static std::string gfxfontFile = "../gfx/LiberationSansNarrow-Bold.ttf";
 
-static char gfxBackGroundFile[] = "../gfx/Background.png";
+const static std::string gfxBackGroundFile = "../gfx/Background.png";
 
-static char gfxNormalCaseFile[] = "../gfx/NormalCase.png";
+const static std::string gfxNormalCaseFile = "../gfx/NormalCase.png";
 
 #define MAX_LADDER_DIGIT 9
 
-static char *gfxHorseFiles[]=
+static std::string gfxHorseFiles[]=
 {
 	"../gfx/RedHorse.png",
 	"../gfx/GreenHorse.png",
@@ -51,8 +51,8 @@ public:
 
 private:
 	void InitSidePanel();
-	bool LoadHorsesBitmap(char * file);
-	SDL_Texture * LoadTexture(char *file);
+	bool LoadHorsesBitmap(const std::string& file);
+	SDL_Texture * LoadTexture(const std::string& file);
 	bool BuildStartCaseBitmap();
 	bool BuildLadderCaseBitmap();
 	//void DrawPixel(int x, int y, U8 R, U8 G, U8 B);
@@ -67,7 +67,7 @@ private:
 	void blitScoreLabel(std::vector<int> scores);
 	void blitBoxLabel(int horsesInTheBox, int iColor);
 
-	static TTF_Font * LoadFont(const char * file, int size);
+	static TTF_Font * LoadFont(const std::string& file, int size);
 
 	int getTextureW(SDL_Texture *pTexture);
 	int getTextureH(SDL_Texture *pTexture);

@@ -56,23 +56,23 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHor
 	m_wnd = SDL_CreateWindow("Plateau",
 							SDL_WINDOWPOS_UNDEFINED,
 							SDL_WINDOWPOS_UNDEFINED,
-							0, 0,
-							SDL_WINDOW_FULLSCREEN_DESKTOP);
+							screensizeX, screensizeY,
+							SDL_WINDOW_SHOWN);//SDL_WINDOW_FULLSCREEN_DESKTOP);
 	if ( m_wnd == NULL ) {
-		fprintf(stderr, "Impossible de créer la fenetre\n");
+		fprintf(stderr, "Impossible de crÃ©er la fenetre\n");
 		exit(6);
 	}
 
-	m_renderer = SDL_CreateRenderer(m_wnd, -1, 0);
+	m_renderer = SDL_CreateRenderer(m_wnd, -1, SDL_RENDERER_ACCELERATED);
 	if ( m_renderer == NULL ) {
-		fprintf(stderr, "Impossible de créer le gestionnaire de rendu\n");
+		fprintf(stderr, "Impossible de crÃ©er le gestionnaire de rendu\n");
 		exit(7);
 	}
 
-	if ( SDL_CreateWindowAndRenderer(0,0,SDL_WINDOW_FULLSCREEN_DESKTOP, &m_wnd, &m_renderer) != 0 ) {
-		fprintf(stderr, "Impossible d'associer le gestionnaire de rendu à le fenetre\n");
-		exit(8);
-	}
+//	if ( SDL_CreateWindowAndRenderer(0,0,SDL_WINDOW_SHOWN /*SDL_WINDOW_FULLSCREEN_DESKTOP*/, &m_wnd, &m_renderer) != 0 ) {
+//		fprintf(stderr, "Impossible d'associer le gestionnaire de rendu Ã  le fenetre\n");
+//		exit(8);
+//	}
 
 	InitSidePanel();
 
@@ -85,7 +85,7 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHor
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); // better rendering of dimension
 	SDL_RenderSetLogicalSize(m_renderer, m_screensizeX, m_screensizeY);
 
-	for(unsigned int i = 0; i<sizeof(gfxHorseFiles)/sizeof(char *); i++)
+	for(unsigned int i = 0; i<sizeof(gfxHorseFiles)/sizeof(std::string); i++)
 	{
 		if(!LoadHorsesBitmap(gfxHorseFiles[i]))
 		{
@@ -102,13 +102,13 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHor
 	BuildLadderCaseBitmap();
 }
 
-TTF_Font * GfxBoard::LoadFont(const char * file, int size)
+TTF_Font * GfxBoard::LoadFont(const std::string& file, int size)
 {
-	TTF_Font* pOutputFont = TTF_OpenFont(file,size);
+	TTF_Font* pOutputFont = TTF_OpenFont(file.c_str(),size);
 	if((pOutputFont == NULL)
-		&& (strnlen(file,255) + 1 > sizeof(STR_PARENT_DIRECTORY)))
+		&& (file.length() + 1 > sizeof(STR_PARENT_DIRECTORY)))
 	{
-		pOutputFont = TTF_OpenFont(file + sizeof(STR_PARENT_DIRECTORY) - 1,size);
+		pOutputFont = TTF_OpenFont(file.c_str() + sizeof(STR_PARENT_DIRECTORY) - 1,size);
 	}
 	return pOutputFont;
 }
@@ -132,22 +132,29 @@ GfxBoard::~GfxBoard()
 			SDL_DestroyTexture(*it2);
 		}
 	}
+        
+        //Destroy window
+        SDL_DestroyRenderer( m_renderer );
+        SDL_DestroyWindow( m_wnd );
+        m_wnd = NULL;
+        m_renderer = NULL;
+        
 	m_playerladderImages.clear();
 	TTF_CloseFont(m_pFont);
 	TTF_CloseFont(m_pLittleFont);
 }
 
 
-SDL_Texture * GfxBoard::LoadTexture(char *file)
+SDL_Texture * GfxBoard::LoadTexture(const std::string& file)
 {
 	/* Charger une image BMP dans une surface*/
 	//SDL_Surface *image = SDL_LoadBMP(file);//Can only load bmp files!
-	SDL_Surface *image = IMG_Load(file);//Can load many type of files!
+	SDL_Surface *image = IMG_Load(file.c_str());//Can load many type of files!
 	SDL_Texture *texture = NULL;
 	if((image == NULL)
-		&& (strnlen(file,255) + 1 > sizeof(STR_PARENT_DIRECTORY)))
+		&& (file.length() + 1 > sizeof(STR_PARENT_DIRECTORY)))
 	{
-		image = IMG_Load(file + sizeof(STR_PARENT_DIRECTORY) - 1);
+		image = IMG_Load(file.c_str() + sizeof(STR_PARENT_DIRECTORY) - 1);
 		if(image == NULL){
 			fprintf(stderr, "Impossible de charger %s: %s\n", file, SDL_GetError());
 		}
@@ -177,7 +184,7 @@ int GfxBoard::getTextureH(SDL_Texture *pTexture)
 	return h;
 }
 
-bool GfxBoard::LoadHorsesBitmap(char *file)
+bool GfxBoard::LoadHorsesBitmap(const std::string& file)
 {
 	SDL_Texture* texture = LoadTexture(file);
 	if(texture!=NULL) {
@@ -203,8 +210,8 @@ bool GfxBoard::ComputeGfxCoordinate()
 void GfxBoard::ShowBMP(SDL_Texture* texture,int x, int y)
 {
 	SDL_Rect dest;
-    /* Copie à l'écran.
-	La surface ne doit pas être bloquée maintenant
+    /* Copie Ã  l'Ã©cran.
+	La surface ne doit pas Ãªtre bloquÃ©e maintenant
      */
 	int w, h;
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h); //TODO test if w and h are valid!
