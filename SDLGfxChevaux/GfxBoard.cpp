@@ -8,10 +8,10 @@
 
 #include "FileUtility.h"
 #include "GfxBoard.h"
-#include "SDL.h"
-#include "SDL_image.h"
-#include "SDL_ttf.h"
-#include <SDL_endian.h> /* Used for the endian-dependent 24 bpp mode */
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_endian.h> /* Used for the endian-dependent 24 bpp mode */
 
 #define MAX_DISPLAYED_HORSE 8
 
@@ -159,7 +159,7 @@ SDL_Texture * GfxBoard::LoadTexture(const std::string& file)
 			fprintf(stderr, "Impossible de charger %s: %s\n", file, SDL_GetError());
 		}
 		else {
-			texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, image->w, image->h);
+			texture = SDL_CreateTextureFromSurface(m_renderer, image);
 			SDL_FreeSurface(image);
 		}
 	}
@@ -268,22 +268,21 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 	SDL_RenderClear(m_renderer);
 
 	tStringList displayTab(getMaxY(),std::string(getMaxX(),' '));
-	for(tpCaseList::iterator itCase=caseList.begin(); itCase != caseList.end(); itCase++)
+	for(tCaseList::iterator itCase=getCasesList().begin(); itCase != getCasesList().end(); itCase++)
 	{
-		tCaseId pItCase = *itCase;
-		LogicalLocalization loc = getCase(pItCase).getLocalization();
+		LogicalLocalization loc = itCase->getLocalization();
 
-		Horse * horse = getCase(pItCase).getHorse();
+		Horse * horse = itCase->getHorse();
 		SDL_Texture* texture = NULL;
 		S32 offsetX = 0;
 		S32 offsetY = 0;
 
-		if(getCase(pItCase).isAStartCase())
+		if(itCase->isAStartCase())
 		{
 			//c = '_';
 			for(tPlayerList::iterator itPlayer=this->getPlayersList().begin(); itPlayer!=this->getPlayersList().end(); itPlayer++)
 			{
-				if(getCase(pItCase).isAStartCaseForPlayer(&*itPlayer))
+				if(itCase->isAStartCaseForPlayer(&*itPlayer))
 				{
 					texture = m_startCaseImages[itPlayer->getPlayerNb()];
 					break;
@@ -294,14 +293,14 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 			offsetX = (m_gridCaseSizeX - w)/2;
 			offsetY = (m_gridCaseSizeY - h)/2;
 		}
-		else if(getCase(pItCase).isAPureLadderCase())
+		else if(itCase->isAPureLadderCase())
 		{
 			//c = static_cast<char>('0' + itCase->getLadderCaseValue());
 			for(tPlayerList::iterator itPlayer=this->getPlayersList().begin(); itPlayer!=this->getPlayersList().end(); itPlayer++)
 			{
-				if(getCase(pItCase).isALadderForPlayer(&*itPlayer))
+				if(itCase->isALadderForPlayer(&*itPlayer))
 				{
-					texture = m_playerladderImages[itPlayer->getPlayerNb()][getCase(pItCase).getLadderCaseValue()-1];
+					texture = m_playerladderImages[itPlayer->getPlayerNb()][itCase->getLadderCaseValue()-1];
 					break;
 				}
 			}
@@ -309,12 +308,12 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 			offsetX = (m_gridCaseSizeX - w)/2;
 			offsetY = (m_gridCaseSizeY - h)/2;
 		}
-		else if(getCase(pItCase).isAFinishCase())
+		else if(itCase->isAFinishCase())
 		{
 			//c = '$';
 			texture = NULL;
 		}
-		else if(getCase(pItCase).isANormalCase())
+		else if(itCase->isANormalCase())
 		{
 			//c = '.';
 			texture = m_normalCaseImage;
@@ -369,7 +368,6 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 		}
 		//displayTab[loc.getY()][loc.getX()]=c;
 	}
-	SDL_RenderPresent(m_renderer);
 	return true;
 }
 
@@ -413,6 +411,7 @@ void GfxBoard::displayLeftPannel(std::string human, std::string nickname, int di
 	blitDieLabel(die, iColor);
 	blitScoreLabel(scores);
 	blitBoxLabel(horsesInTheBox, iColor);
+        SDL_RenderPresent(m_renderer);
 }
 
 void GfxBoard::blitHumanLabel(std::string &human, int iColor)
@@ -421,7 +420,7 @@ void GfxBoard::blitHumanLabel(std::string &human, int iColor)
 	int HumanPositionY = 0;
 
 	SDL_Surface *text_surface = TTF_RenderText_Solid(m_pLittleFont,human.c_str(),colors[iColor]);
-	SDL_Texture *text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+	SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 	ShowBMP(text_texture, LeftPannelPositionX, HumanPositionY);
 	SDL_FreeSurface(text_surface);
 }
@@ -435,7 +434,7 @@ void GfxBoard::blitNickLabel(std::string &nickname, int iColor)
 	nicknameLabel += nickname;
 
 	SDL_Surface *text_surface = TTF_RenderText_Solid(m_pLittleFont,nicknameLabel.c_str(),colors[iColor]);
-	SDL_Texture *text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+	SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 	ShowBMP(text_texture, LeftPannelPositionX, nickPositionY);
 	SDL_FreeSurface(text_surface);
 }
@@ -451,7 +450,7 @@ void GfxBoard::blitDieLabel(int die, int iColor)
 
 	SDL_Surface *text_surface = TTF_RenderText_Solid(m_pFont,dieStr.c_str(),colors[iColor]);
 	int offsetX = (m_screensizeX - LeftPannelPositionX) / 2;
-	SDL_Texture *text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+	SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 	ShowBMP(text_texture, LeftPannelPositionX + offsetX, diePositionY);
 	SDL_FreeSurface(text_surface);
 }
@@ -466,7 +465,7 @@ void GfxBoard::blitScoreLabel(std::vector<int> scores)
 	
 	SDL_Color whiteColor = {255,255,255};
 	SDL_Surface *text_surface = TTF_RenderText_Solid(m_pFont,"Score:",whiteColor);
-	SDL_Texture *text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+	SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 	ShowBMP(text_texture, LeftPannelPositionX, scorePositionY);
 	scorePositionY+= text_surface->h * 8 /10;
 	SDL_FreeSurface(text_surface);
@@ -476,7 +475,7 @@ void GfxBoard::blitScoreLabel(std::vector<int> scores)
 		ss << *it;
 		scoreStr = ss.str();
 		text_surface = TTF_RenderText_Solid(m_pFont,scoreStr.c_str(),colors[iColor]);
-		text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+		text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 		ShowBMP(text_texture, LeftPannelPositionX, scorePositionY);
 		scorePositionY+= text_surface->h * 8 /10;
 		SDL_FreeSurface(text_surface);
@@ -497,7 +496,7 @@ void GfxBoard::blitBoxLabel(int horsesInTheBox, int iColor)
 		ss << std::setw(3) << std::setfill('0') << horsesInTheBox;
 		std::string str = ss.str();
 		SDL_Surface *text_surface = TTF_RenderText_Solid(m_pFont,str.c_str(),colors[iColor]);
-		SDL_Texture *text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+		SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 		ShowBMP(text_texture, LeftPannelPositionX + getTextureW(m_horseImages[iColor]), boxPositionY);
 		SDL_FreeSurface(text_surface);
 	}
@@ -525,7 +524,7 @@ bool GfxBoard::BuildStartCaseBitmap()
 		}
 		else
 		{
-			SDL_Texture *text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+			SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 			m_startCaseImages.push_back(text_texture);
 			SDL_FreeSurface(text_surface);
 		}
@@ -552,7 +551,7 @@ bool GfxBoard::BuildLadderCaseBitmap()
 			}
 			else
 			{
-				SDL_Texture *text_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, text_surface->w, text_surface->h);
+				SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 				m_playerladderImages[iColor].push_back(text_texture);
 				SDL_FreeSurface(text_surface);
 			}
