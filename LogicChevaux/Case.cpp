@@ -5,26 +5,28 @@
 #include "Board.h"
 
 Case::Case(Board * pBoard, unsigned int x, unsigned int y,tCaseId id, char caseValue)
-: m_pBoard(pBoard), m_logicalLocalization(x,y), m_pHorse(NULL), m_pNextCase(CASE_ID_UNKNOWN),
-m_pNextLadderCase(CASE_ID_UNKNOWN), m_id(id), m_caseValue(caseValue), m_ladderValue(0)
+: m_pNextCase(CASE_ID_UNKNOWN), m_pNextLadderCase(CASE_ID_UNKNOWN), m_pHorse(nullptr),
+        m_ladderValue(0), m_caseValue(caseValue), m_id(id), m_pBoard(pBoard),
+        m_logicalLocalization(x,y)
 {
 }
 
 Case::Case(Board * pBoard, const LogicalLocalization &localization, tCaseId id, char caseValue)
-: m_pBoard(pBoard), m_logicalLocalization(localization), m_pHorse(NULL), m_pNextCase(CASE_ID_UNKNOWN),
-m_pNextLadderCase(CASE_ID_UNKNOWN), m_id(id), m_caseValue(caseValue), m_ladderValue(0)
+: m_pNextCase(CASE_ID_UNKNOWN), m_pNextLadderCase(CASE_ID_UNKNOWN), m_pHorse(nullptr),
+        m_ladderValue(0), m_caseValue(caseValue), m_id(id), m_pBoard(pBoard),
+        m_logicalLocalization(localization)
 {
 }
 
 
 bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsigned int level) const
 {
-	assert(horse!=NULL);
+	assert(horse!=nullptr);
 	Horse* pHorseOnNextCase;
 	if(horse->isSleeping() && isAStartCaseForHorse(horse))
 	{
 		assert(level==0);
-		if(m_pHorse==NULL)
+		if(m_pHorse==nullptr)
 		{//case is free (no horse on the case)
 			//return m_pNextCase->nbPossibleMove() + 1;
 			outputMoves[getLadderCaseValue()] = this->getCaseId();
@@ -49,7 +51,7 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 		if(Case::isValidCaseId(m_pNextCase))
 		{
 			pHorseOnNextCase = m_pBoard->getCase(m_pNextCase).getHorse();
-			if(pHorseOnNextCase==NULL)
+			if(pHorseOnNextCase==nullptr)
 			{//case is free (no horse on the case)
 				//return m_pNextCase->nbPossibleMove() + 1;
 				outputMoves[level + 1] = m_pNextCase;
@@ -78,7 +80,7 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 	else //if it is a ladder case or a base normal case of ladder
 	{
 		pHorseOnNextCase = m_pBoard->getCase(m_pNextLadderCase).getHorse();
-		if(pHorseOnNextCase==NULL)
+		if(pHorseOnNextCase==nullptr)
 		{//case is free (no horse on the case)
 			if(Case::isValidCaseId(m_pNextLadderCase))
 			{
@@ -117,14 +119,14 @@ bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsign
 
 bool Case::moveFrom(tCaseId pCaseSource, Horse* pHorse)
 {
-	assert((!Case::isValidCaseId(pCaseSource) && pHorse!=NULL && pHorse->isSleeping())
+	assert((!Case::isValidCaseId(pCaseSource) && pHorse!=nullptr && pHorse->isSleeping())
 		|| Case::isValidCaseId(pCaseSource));
-	assert(pHorse!=NULL || !pHorse->haveSamePlayerOwner(m_pHorse));//check if the player is an opponent!
-	if((Case::isValidCaseId(pCaseSource) && m_pBoard->getCase(pCaseSource).getHorse() != NULL)
-		|| pHorse != NULL)
+	assert(pHorse!=nullptr || !pHorse->haveSamePlayerOwner(m_pHorse));//check if the player is an opponent!
+	if((Case::isValidCaseId(pCaseSource) && m_pBoard->getCase(pCaseSource).getHorse() != nullptr)
+		|| pHorse != nullptr)
 	{
 		Horse* pHorseToMove;
-		if(pHorse != NULL)
+		if(pHorse != nullptr)
 		{//Horse is currently not on the board (so not on a case), but in its rest box.
 			pHorseToMove = pHorse;
 		}
@@ -132,7 +134,7 @@ bool Case::moveFrom(tCaseId pCaseSource, Horse* pHorse)
 		{//Horse is on the board
 			pHorseToMove = m_pBoard->getCase(pCaseSource).getHorse();
 		}
-		if(m_pHorse!=NULL)//TODO
+		if(m_pHorse!=nullptr)//TODO
 		{
 			m_pHorse->returnToSleepingBox();
 		}
@@ -146,7 +148,7 @@ bool Case::moveFrom(tCaseId pCaseSource, Horse* pHorse)
 		}
 		if(Case::isValidCaseId(pCaseSource))
 		{
-			m_pBoard->getCase(pCaseSource).setHorse(NULL);//remove horse from the previous case
+			m_pBoard->getCase(pCaseSource).setHorse(nullptr);//remove horse from the previous case
 		}
 		return true;
 	}
@@ -169,7 +171,7 @@ bool Case::isALadderForPlayer(Player* pPlayer) const
 
 bool Case::isAStartCaseForPlayer(Player* pPlayer) const
 {
-	if(pPlayer!=NULL)
+	if(pPlayer!=nullptr)
 	{
 		return pPlayer->getPlayerId() == m_caseValue;
 	}
@@ -178,7 +180,7 @@ bool Case::isAStartCaseForPlayer(Player* pPlayer) const
 
 bool Case::isAStartCaseForHorse(Horse* pHorse) const
 {
-	if(pHorse!=NULL)
+	if(pHorse!=nullptr)
 	{
 		return isAStartCaseForPlayer(pHorse->getPlayer());
 	}
@@ -187,7 +189,7 @@ bool Case::isAStartCaseForHorse(Horse* pHorse) const
 
 bool Case::isALadderForHorse(Horse* pHorse) const
 {
-	if(pHorse!=NULL)
+	if(pHorse!=nullptr)
 	{
 		return isALadderForPlayer(pHorse->getPlayer());
 	}
@@ -283,7 +285,7 @@ Horse * Case::getHorse() const
 void Case::setHorse(Horse* horse)
 {
 	m_pHorse = horse;
-	if(horse!=NULL)
+	if(horse!=nullptr)
 	{
 		horse->setCase(this->getCaseId());
 	}

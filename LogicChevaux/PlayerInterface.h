@@ -11,10 +11,10 @@ protected:
 public:
 	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves) = 0;
 	virtual std::string& getTypeOfPlayer() { return m_sAiType;};
-protected:
-	Board * m_pBoard;
 private:
 	std::string m_sAiType;
+protected:
+	Board * m_pBoard;
 };
 
 #endif

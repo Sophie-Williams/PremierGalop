@@ -4,12 +4,12 @@
 #include "PlayerInterface.h"
 
 Player::Player(const std::string &nickname, tPLayerId playerId)
-: m_nickname(nickname), m_playerId(playerId), m_pPlayerInterface(NULL), m_exitRequest(false)
+: m_playerId(playerId), m_nickname(nickname), m_pPlayerInterface(nullptr), m_exitRequest(false)
 {}
 
 bool Player::AddHorses(Board * pBoard, unsigned int nbHorses)
 {
-	assert(pBoard!=NULL);
+	assert(pBoard!=nullptr);
 	for(unsigned int i=0; i<nbHorses; i++)
 	{
 		m_horses.push_back(Horse(pBoard, this));
@@ -25,7 +25,7 @@ void Player::setPlayerInterface(PlayerInterface *pPlayerInterface)
 tHorseTargetCase Player::ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves)
 {
 	tHorseTargetCase htc;
-	assert(m_pPlayerInterface!=NULL);
+	assert(m_pPlayerInterface!=nullptr);
 	htc = m_pPlayerInterface->ChooseMoveFrom(listOfMoves);
 	if(mHorseTargetCaseEquals(htc,ASK_QUIT))
 		m_exitRequest = true;
@@ -34,7 +34,7 @@ tHorseTargetCase Player::ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves)
 
 std::string Player::getTypeOfPlayer()
 {
-	assert(m_pPlayerInterface!=NULL);
+	assert(m_pPlayerInterface!=nullptr);
 	return m_pPlayerInterface->getTypeOfPlayer();
 }
 
@@ -46,7 +46,7 @@ Horse* Player::getHorse(unsigned int nb)
 
 unsigned int Player::getHorseNumber(const Horse *horse)
 {
-	if(horse!=NULL)
+	if(horse!=nullptr)
 	{
 		for(tHorseList::iterator it = m_horses.begin(); it != m_horses.end(); it++)
 		{

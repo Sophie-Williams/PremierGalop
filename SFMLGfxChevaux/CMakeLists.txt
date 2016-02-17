@@ -2,6 +2,9 @@ message ( STATUS "==============SDLGfxChevaux===============" )
 
 project(SFMLGFXCHEVAUX)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
+
 # Make sure the compiler can find include files from our Hello library.
 include_directories (${LOGICCHEVAUX_SOURCE_DIR})
 message ( STATUS "LOGICCHEVAUX_SOURCE_DIR=${LOGICCHEVAUX_SOURCE_DIR}" )

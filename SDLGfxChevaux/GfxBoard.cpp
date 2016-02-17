@@ -17,10 +17,10 @@
 
 static SDL_Color colors[]=
 {
-	{0xFF,0x00,0x00}, //red
-	{0x00,0xFF,0x00}, //green
-	{0x00,0x00,0xFF}, //blue
-	{0xFF,0xFF,0x00}, //yellow
+	{0xFF,0x00,0x00,0xFF}, //red
+	{0x00,0xFF,0x00,0xFF}, //green
+	{0x00,0x00,0xFF,0xFF}, //blue
+	{0xFF,0xFF,0x00,0xFF}, //yellow
 };
 
 GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHorses), m_screensizeX(screensizeX), m_screensizeY(screensizeY), m_sidePanelPositionX(screensizeY)
@@ -46,8 +46,8 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHor
 	}
 	atexit(TTF_Quit);
 
-	if((m_pFont = LoadFont(gfxfontFile, 40)) == NULL
-		|| (m_pLittleFont = LoadFont(gfxfontFile, 15)) == NULL)
+	if((m_pFont = LoadFont(gfxfontFile, 40)) == nullptr
+		|| (m_pLittleFont = LoadFont(gfxfontFile, 15)) == nullptr)
 	{
 		std::cerr << "Can't open ttf: " << TTF_GetError() << std::endl;
 		exit(4);
@@ -57,14 +57,14 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHor
 							SDL_WINDOWPOS_UNDEFINED,
 							SDL_WINDOWPOS_UNDEFINED,
 							screensizeX, screensizeY,
-							SDL_WINDOW_SHOWN);//SDL_WINDOW_FULLSCREEN_DESKTOP);
-	if ( m_wnd == NULL ) {
+							SDL_WINDOW_FULLSCREEN_DESKTOP);
+	if ( m_wnd == nullptr ) {
 		fprintf(stderr, "Impossible de créer la fenetre\n");
 		exit(6);
 	}
 
 	m_renderer = SDL_CreateRenderer(m_wnd, -1, SDL_RENDERER_ACCELERATED);
-	if ( m_renderer == NULL ) {
+	if ( m_renderer == nullptr ) {
 		fprintf(stderr, "Impossible de créer le gestionnaire de rendu\n");
 		exit(7);
 	}
@@ -93,7 +93,7 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHor
 			exit(10);
 		}
 	}
-	if((m_normalCaseImage = LoadTexture(gfxNormalCaseFile)) == NULL)
+	if((m_normalCaseImage = LoadTexture(gfxNormalCaseFile)) == nullptr)
 	{
 		std::cerr << "Impossible de charger l'image: " << gfxNormalCaseFile << "  raison: %s" << SDL_GetError() << std::endl;
 		exit(20);
@@ -105,7 +105,7 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) : Board(nbHor
 TTF_Font * GfxBoard::LoadFont(const std::string& file, int size)
 {
 	TTF_Font* pOutputFont = TTF_OpenFont(file.c_str(),size);
-	if((pOutputFont == NULL)
+	if((pOutputFont == nullptr)
 		&& (file.length() + 1 > sizeof(STR_PARENT_DIRECTORY)))
 	{
 		pOutputFont = TTF_OpenFont(file.c_str() + sizeof(STR_PARENT_DIRECTORY) - 1,size);
@@ -136,8 +136,8 @@ GfxBoard::~GfxBoard()
         //Destroy window
         SDL_DestroyRenderer( m_renderer );
         SDL_DestroyWindow( m_wnd );
-        m_wnd = NULL;
-        m_renderer = NULL;
+        m_wnd = nullptr;
+        m_renderer = nullptr;
         
 	m_playerladderImages.clear();
 	TTF_CloseFont(m_pFont);
@@ -150,13 +150,13 @@ SDL_Texture * GfxBoard::LoadTexture(const std::string& file)
 	/* Charger une image BMP dans une surface*/
 	//SDL_Surface *image = SDL_LoadBMP(file);//Can only load bmp files!
 	SDL_Surface *image = IMG_Load(file.c_str());//Can load many type of files!
-	SDL_Texture *texture = NULL;
-	if((image == NULL)
+	SDL_Texture *texture = nullptr;
+	if((image == nullptr)
 		&& (file.length() + 1 > sizeof(STR_PARENT_DIRECTORY)))
 	{
 		image = IMG_Load(file.c_str() + sizeof(STR_PARENT_DIRECTORY) - 1);
-		if(image == NULL){
-			fprintf(stderr, "Impossible de charger %s: %s\n", file, SDL_GetError());
+		if(image == nullptr){
+			std::cerr << "Impossible de charger " << file.c_str() << ":" << SDL_GetError() << std::endl;
 		}
 		else {
 			texture = SDL_CreateTextureFromSurface(m_renderer, image);
@@ -169,7 +169,7 @@ SDL_Texture * GfxBoard::LoadTexture(const std::string& file)
 int GfxBoard::getTextureW(SDL_Texture *pTexture)
 {
 	int w, h;
-	if(pTexture==NULL || SDL_QueryTexture(pTexture, NULL, NULL, &w, &h)!=0) {
+	if(pTexture==nullptr || SDL_QueryTexture(pTexture, nullptr, nullptr, &w, &h)!=0) {
 		w=0;h=0;
 	}
 	return w;
@@ -178,7 +178,7 @@ int GfxBoard::getTextureW(SDL_Texture *pTexture)
 int GfxBoard::getTextureH(SDL_Texture *pTexture)
 {
 	int w, h;
-	if(pTexture==NULL || SDL_QueryTexture(pTexture, NULL, NULL, &w, &h)!=0) {
+	if(pTexture==nullptr || SDL_QueryTexture(pTexture, nullptr, nullptr, &w, &h)!=0) {
 		w=0;h=0;
 	}
 	return h;
@@ -187,10 +187,10 @@ int GfxBoard::getTextureH(SDL_Texture *pTexture)
 bool GfxBoard::LoadHorsesBitmap(const std::string& file)
 {
 	SDL_Texture* texture = LoadTexture(file);
-	if(texture!=NULL) {
+	if(texture!=nullptr) {
 		m_horseImages.push_back(texture);
 	}
-	return (texture!=NULL);
+	return (texture!=nullptr);
 }
 
 bool GfxBoard::ReadBoardTopologyFromTable(unsigned int maxLength)
@@ -214,13 +214,13 @@ void GfxBoard::ShowBMP(SDL_Texture* texture,int x, int y)
 	La surface ne doit pas être bloquée maintenant
      */
 	int w, h;
-	SDL_QueryTexture(texture, NULL, NULL, &w, &h); //TODO test if w and h are valid!
+	SDL_QueryTexture(texture, nullptr, nullptr, &w, &h); //TODO test if w and h are valid!
 
     dest.x = static_cast<S16>(x);
     dest.y = static_cast<S16>(y);
     dest.w = static_cast<U16>(w);
     dest.h = static_cast<U16>(h);
-	SDL_RenderCopy(m_renderer, texture, NULL /* take all the texture*/, &dest);
+	SDL_RenderCopy(m_renderer, texture, nullptr /* take all the texture*/, &dest);
 }
 
 bool GfxBoard::ConvertLogicalToGfxCoordinate(LogicalLocalization &logicLoc, S32 &x, S32 &y, U16 &sizeX, U16 &sizeY)
@@ -253,7 +253,7 @@ bool GfxBoard::displayBoard()
 	return displayBoard(caseList);
 }
 
-bool GfxBoard::displayBoard(tpCaseList &caseList)
+bool GfxBoard::displayBoard(tpCaseList & /*caseList*/)
 {
 	int w, h;
 	// =================
@@ -268,69 +268,69 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 	SDL_RenderClear(m_renderer);
 
 	tStringList displayTab(getMaxY(),std::string(getMaxX(),' '));
-	for(tCaseList::iterator itCase=getCasesList().begin(); itCase != getCasesList().end(); itCase++)
+	for(const auto& caseItem : getCasesList())
 	{
-		LogicalLocalization loc = itCase->getLocalization();
+		LogicalLocalization loc = caseItem.getLocalization();
 
-		Horse * horse = itCase->getHorse();
-		SDL_Texture* texture = NULL;
+		Horse * horse = caseItem.getHorse();
+		SDL_Texture* texture = nullptr;
 		S32 offsetX = 0;
 		S32 offsetY = 0;
 
-		if(itCase->isAStartCase())
+		if(caseItem.isAStartCase())
 		{
 			//c = '_';
 			for(tPlayerList::iterator itPlayer=this->getPlayersList().begin(); itPlayer!=this->getPlayersList().end(); itPlayer++)
 			{
-				if(itCase->isAStartCaseForPlayer(&*itPlayer))
+				if(caseItem.isAStartCaseForPlayer(&*itPlayer))
 				{
 					texture = m_startCaseImages[itPlayer->getPlayerNb()];
 					break;
 				}
 			}
 			//center offset adjustment
-			SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+			SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 			offsetX = (m_gridCaseSizeX - w)/2;
 			offsetY = (m_gridCaseSizeY - h)/2;
 		}
-		else if(itCase->isAPureLadderCase())
+		else if(caseItem.isAPureLadderCase())
 		{
-			//c = static_cast<char>('0' + itCase->getLadderCaseValue());
+			//c = static_cast<char>('0' + caseItem.getLadderCaseValue());
 			for(tPlayerList::iterator itPlayer=this->getPlayersList().begin(); itPlayer!=this->getPlayersList().end(); itPlayer++)
 			{
-				if(itCase->isALadderForPlayer(&*itPlayer))
+				if(caseItem.isALadderForPlayer(&*itPlayer))
 				{
-					texture = m_playerladderImages[itPlayer->getPlayerNb()][itCase->getLadderCaseValue()-1];
+					texture = m_playerladderImages[itPlayer->getPlayerNb()][caseItem.getLadderCaseValue()-1];
 					break;
 				}
 			}
-			SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+			SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 			offsetX = (m_gridCaseSizeX - w)/2;
 			offsetY = (m_gridCaseSizeY - h)/2;
 		}
-		else if(itCase->isAFinishCase())
+		else if(caseItem.isAFinishCase())
 		{
 			//c = '$';
-			texture = NULL;
+			texture = nullptr;
 		}
-		else if(itCase->isANormalCase())
+		else if(caseItem.isANormalCase())
 		{
 			//c = '.';
 			texture = m_normalCaseImage;
 			//center offset adjustment
-			SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+			SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 			offsetX = (m_gridCaseSizeX - w)/2;
 			offsetY = (m_gridCaseSizeY - h);
 		}
 		else
 		{
 			//c = '?';
-			texture = NULL;
+			texture = nullptr;
 		}
 		////////////////////
 		S32 x = 0, y = 0;
 		U16 sizeX = 0, sizeY = 0;
-		if(texture!=NULL)
+		if(texture!=nullptr)
 		{
 			if(ConvertLogicalToGfxCoordinate(loc,x,y,sizeX,sizeY))
 			{
@@ -341,9 +341,9 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 		}
 
 		////////////////////
-		if(horse!=NULL)
+		if(horse!=nullptr)
 		{
-			assert(horse->getPlayer()!=NULL);
+			assert(horse->getPlayer()!=nullptr);
 			assert(Case::isValidCaseId(horse->getCase()));
 			//c = static_cast<char>('a' + horse->getPlayer()->getPlayerNb());
 			texture = m_horseImages[horse->getPlayer()->getPlayerNb()];
@@ -351,12 +351,12 @@ bool GfxBoard::displayBoard(tpCaseList &caseList)
 			////////////////////
 			S32 x = 0, y = 0;
 			U16 sizeX = 0, sizeY = 0;
-			if(texture!=NULL)
+			if(texture!=nullptr)
 			{
 				if(ConvertLogicalToGfxCoordinate(loc,x,y,sizeX,sizeY))
 				{
 					//center offset adjustment
-					SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+					SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 					offsetX = (m_gridCaseSizeX - w)/2;
 					offsetY = (m_gridCaseSizeY - h)/2;
 					x+=offsetX;
@@ -463,7 +463,7 @@ void GfxBoard::blitScoreLabel(std::vector<int> scores)
 	std::string scoreStr;
 	std::stringstream ss;
 	
-	SDL_Color whiteColor = {255,255,255};
+	SDL_Color whiteColor = {255,255,255,255};
 	SDL_Surface *text_surface = TTF_RenderText_Solid(m_pFont,"Score:",whiteColor);
 	SDL_Texture *text_texture = SDL_CreateTextureFromSurface(m_renderer, text_surface);
 	ShowBMP(text_texture, LeftPannelPositionX, scorePositionY);
@@ -514,10 +514,10 @@ void GfxBoard::blitBoxLabel(int horsesInTheBox, int iColor)
 
 bool GfxBoard::BuildStartCaseBitmap()
 {
-	for(int iColor=0; iColor<sizeof(colors); iColor++)
+	for(unsigned int iColor=0; iColor<sizeof(colors); iColor++)
 	{
 		SDL_Surface *text_surface = TTF_RenderText_Solid(m_pFont,"D",colors[iColor]);
-		if(text_surface==NULL)
+		if(text_surface==nullptr)
 		{
 			std::cerr << "Can't render glif from ttf: " << TTF_GetError() << std::endl;
 			return false;
@@ -535,16 +535,16 @@ bool GfxBoard::BuildStartCaseBitmap()
 bool GfxBoard::BuildLadderCaseBitmap()
 {
 	m_playerladderImages.reserve(sizeof(colors));
-	for(int iColor=0; iColor<sizeof(colors); iColor++)
+	for(unsigned int iColor=0; iColor<sizeof(colors); iColor++)
 	{
 		m_playerladderImages.push_back(tpTextureList());
 		m_playerladderImages[iColor].reserve(MAX_LADDER_DIGIT);
 		for(char iDigit = 0; iDigit<MAX_LADDER_DIGIT; iDigit++)
 		{
-			char digitChar[] = {'1' + iDigit, '\0' };
+			char digitChar[] = {static_cast<char>('1' + iDigit), '\0' };
 			SDL_Surface *text_surface = TTF_RenderText_Solid(m_pFont,digitChar,colors[iColor]);
 
-			if(text_surface==NULL)
+			if(text_surface==nullptr)
 			{
 				std::cerr << "Can't render glif from ttf: " << TTF_GetError() << std::endl;
 				return false;
@@ -580,7 +580,7 @@ bool GfxBoard::GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int 
 					if(Case::isValidCaseId(pointedCase))
 					{
 						Horse * pointedHorse = getCase(pointedCase).getHorse();
-						if(pointedHorse!=NULL)
+						if(pointedHorse!=nullptr)
 						{
 							nbPlayer = pointedHorse->getPlayer()->getPlayerNb();
 							nbHorse = pointedHorse->getHorseNumber();

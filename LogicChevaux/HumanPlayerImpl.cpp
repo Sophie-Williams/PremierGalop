@@ -2,7 +2,7 @@
 
 tHorseTargetCase HumanPlayerImpl::ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves)
 {
-	tHorseTargetCase horseTargetCase = {0};
+	tHorseTargetCase horseTargetCase = {nullptr, CASE_ID_UNKNOWN};
 	bool bOK = false;
 	do
 	{
@@ -11,7 +11,7 @@ tHorseTargetCase HumanPlayerImpl::ChooseMoveFrom(const tHorseTargetCaseList &lis
 		int playerNb = -1;
 		if(m_pBoard->GetChoiceFromEvents(userEvent, horseNb, playerNb) && userEvent!=CloseEvent)
 		{
-			horseTargetCase.pHorse=NULL;
+			horseTargetCase.pHorse=nullptr;
 			horseTargetCase.pTargetCase=CASE_ID_UNKNOWN;
 			for(tHorseTargetCaseList::const_iterator it = listOfMoves.begin(); !bOK && it != listOfMoves.end(); it++)
 			{
@@ -43,9 +43,13 @@ tHorseTargetCase HumanPlayerImpl::ChooseMoveFrom(const tHorseTargetCaseList &lis
 						bOK = true;
 						horseTargetCase = *it;
 					}
+                                	break;
+				case None:
+				case CloseEvent:
+					break;
 				}
 			}
-			/*if(horseTargetCase.pHorse == NULL)
+			/*if(horseTargetCase.pHorse == nullptr)
 			{
 				bOK = true;
 				horseTargetCase = listOfMoves.front();

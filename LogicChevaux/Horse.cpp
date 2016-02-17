@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "Board.h"
 
-Horse::Horse(Board * pBoard, Player *player) : m_pBoard(pBoard), m_pPlayer(player), m_pCase(CASE_ID_UNKNOWN), m_bIsArrived(false), m_score(0)
+Horse::Horse(Board * pBoard, Player *player) : m_pPlayer(player), m_pCase(CASE_ID_UNKNOWN), m_bIsArrived(false), m_score(0), m_pBoard(pBoard)
 {
 }
 
@@ -19,7 +19,7 @@ tCaseId Horse::getCase() const
 
 bool Horse::haveSamePlayerOwner(const Horse *horse) const
 {
-	if(horse==NULL)
+	if(horse==nullptr)
 		return false;
 	else
 		return horse->getPlayer() == this->getPlayer();

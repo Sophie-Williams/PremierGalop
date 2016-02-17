@@ -21,7 +21,7 @@ typedef struct
 	tCaseId pTargetCase;
 } tHorseTargetCase;
 
-const tHorseTargetCase ASK_QUIT = {NULL,CASE_ID_UNKNOWN};
+const tHorseTargetCase ASK_QUIT = {nullptr,CASE_ID_UNKNOWN};
 
 #define mHorseTargetCaseEquals(a,b) (((a).pHorse==(b).pHorse) && ((a).pTargetCase.id==(b).pTargetCase.id))
 

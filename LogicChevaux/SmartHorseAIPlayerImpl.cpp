@@ -20,7 +20,7 @@ tHorseTargetCase SmartHorseAIPlayerImpl::ChooseMoveFrom(const tHorseTargetCaseLi
 			}
 		}
 	}
-	const tHorseTargetCase * pHorseTargetCase = NULL;
+	const tHorseTargetCase * pHorseTargetCase = nullptr;
 	int score = 0;
 	for(tHorseTargetCaseList::const_iterator it = listOfMoves.begin(); it != listOfMoves.end(); it++)
 	{

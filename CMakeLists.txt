@@ -16,6 +16,25 @@ set(BUILD_SDL_SUPPORT TRUE CACHE BOOL "TRUE to build with SDL support")
 # add an option for choosing the SFML support
 set(BUILD_SFML_SUPPORT TRUE CACHE BOOL "TRUE to build with SFML support")
 
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
+
+# Bump up warning levels appropriately for clang, gcc & msvc
+# Also set debug/optimization flags depending on the build type. IDE users choose this when
+# selecting the build mode in their IDE
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++14")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+	if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+	endif()
+endif()
+
 add_subdirectory(bin2C)
 add_subdirectory(gfx)
 add_subdirectory(maps)

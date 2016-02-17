@@ -1,6 +1,3 @@
-// bin2C.cpp : définit le point d'entrée pour l'application console.
-//
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -16,19 +13,19 @@ int main(int argc, char* argv[])
 		outputFileStr += ".h";
 		std::ofstream outputStream(outputFileStr.c_str());
 		std::string varNameStr;
-		for(std::string::iterator it=inputFileStr.begin();it!=inputFileStr.end();it++)
+		for(const auto& line : inputFileStr)
 		{
-			if(*it=='\\' || *it == '/')
+			if(line == '\\' || line == '/')
 			{//it means that we where parsing a directory, not a file name, so we reset the var name.
 				varNameStr.clear();
 			}
-			else if(*it=='.' || *it==' ' || *it=='-')//replace all invalid characters for a variable by an underscore
+			else if(line == '.' || line == ' ' || line == '-')//replace all invalid characters for a variable by an underscore
 			{
 				varNameStr.push_back('_');
 			}
 			else
 			{
-				varNameStr.push_back(*it);
+				varNameStr.push_back(line);
 			}
 		}
 		if(inputStream.is_open() && outputStream.is_open())

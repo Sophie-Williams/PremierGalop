@@ -22,7 +22,7 @@ ConfigParam::~ConfigParam()
 
 void ConfigParam::displayAndConfigure(Board *pBoard, const tPlayerInterfaceVector &playerInterfaceVector)
 {
-	if(pBoard!=NULL)
+	if(pBoard!=nullptr)
 	{
 		std::cout << "Game configuration:" << std::endl;
 		std::cout << "You can choose the following intelligences :" << std::endl;
@@ -48,7 +48,7 @@ void ConfigParam::displayAndConfigure(Board *pBoard, const tPlayerInterfaceVecto
 					std::cin >> c;
 				}
 			}
-			while(i<0 || i>= playerInterfaceVector.size());
+			while(i>= playerInterfaceVector.size());
 			it->setPlayerInterface(playerInterfaceVector[i]);
 			//Step 2 Choose Name:
 			std::cout << "Choose Name for player " << it - pBoard->getPlayersList().begin() << " : ";

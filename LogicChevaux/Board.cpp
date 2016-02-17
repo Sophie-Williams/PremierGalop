@@ -11,9 +11,9 @@
 #include "Player.h"
 #include "FileUtility.h"
 
-Board::Board(U32 nbHorses) : m_timeScoreResolution(1), m_maxladderCaseValue(0), m_nbHorses(nbHorses)
+Board::Board(U32 nbHorses) :  m_nbHorses(nbHorses), m_maxladderCaseValue(0), m_timeScoreResolution(1)
 {
-	srand( (unsigned)time( NULL ) );
+	srand( (unsigned)time( nullptr ) );
 }
 
 bool Board::ReadBoardTopologyFromFile(const std::string &file)
@@ -87,7 +87,7 @@ bool Board::ReadBoardTopologyFromTable(unsigned int maxLength)
 			}
 		}
 
-		//add padding null character to all the string with a size less than maxLength (avoid invalid access memory)
+		//add padding nullptr character to all the string with a size less than maxLength (avoid invalid access memory)
 		if(it->size()<maxLength)
 		{
 			it->resize(maxLength, ' ');
@@ -375,7 +375,7 @@ bool Board::displayBoard()
 		LogicalLocalization loc = itCase->getLocalization();
 		Horse * horse = itCase->getHorse();
 		char c;
-		if(horse==NULL)
+		if(horse==nullptr)
 		{
 			if(itCase->isAStartCase())
 				c = '_';
@@ -390,7 +390,7 @@ bool Board::displayBoard()
 		}
 		else
 		{
-			assert(horse->getPlayer()!=NULL);
+			assert(horse->getPlayer()!=nullptr);
 			assert(Case::isValidCaseId(horse->getCase()));
 			c = static_cast<char>('a' + horse->getPlayer()->getPlayerNb());
 		}
@@ -420,8 +420,8 @@ unsigned int Board::launchDie(unsigned int maxValue)
 
 bool Board::playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outputMoves, unsigned int &outputDie)
 {
-	assert(currentPlayer!=NULL);
-	if(currentPlayer!=NULL)
+	assert(currentPlayer!=nullptr);
+	if(currentPlayer!=nullptr)
 	{
 		outputDie = launchDie();
 		outputMoves.clear();//must be sure that the list is empty before filling it!
@@ -429,8 +429,8 @@ bool Board::playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outp
 		{
 			Horse* currentHorse = currentPlayer->getHorse(iHorse);
 
-			assert(currentHorse!=NULL);
-			if(currentHorse!=NULL)
+			assert(currentHorse!=nullptr);
+			if(currentHorse!=nullptr)
 			{
 				tCaseId currentCase = CASE_ID_UNKNOWN;
 				if(currentHorse->isRunning())
@@ -463,7 +463,7 @@ bool Board::playOneTurnRequest(Player* currentPlayer, tHorseTargetCaseList &outp
 bool Board::playOneTurnResponse(Horse* horseToMove, tCaseId caseToReach, unsigned int inputDie, Player* &nextPlayer)
 {
 	bool bStatus = true;
-	if(horseToMove!=NULL)
+	if(horseToMove!=nullptr)
 	{
 		horseToMove->incrementScore(inputDie);
 		if(inputDie!=m_maxladderCaseValue)//in a standard game, without a 6 the player don't have the right to relaunch the die
@@ -493,7 +493,7 @@ Player* Board::getPlayer(unsigned int playerNumber)
 	{
 		return &m_players[playerNumber];
 	}
-	return NULL;
+	return nullptr;
 }
 
 unsigned int Board::GetNumberOfHorsesByPLayer() const
@@ -515,7 +515,7 @@ bool Board::getNextPlayer(Player* &nextPlayer)
 		}
 	}
 	while(nextPlayerNb!=currentPlayerNumber);//next player can't be the same player than the previous one!
-	nextPlayer=NULL;
+	nextPlayer=nullptr;
 	return false;
 }
 
@@ -577,8 +577,8 @@ int Board::GetHorseNumberInTheBox(tHorseTargetCaseList &horseList)
 	int nbHorseInTheBox = 0;
 	for(tHorseTargetCaseList::const_iterator it = horseList.begin(); it != horseList.end(); it++)
 	{
-		assert(it->pHorse!=NULL);
-		if(it->pHorse!=NULL && it->pHorse->isSleeping())
+		assert(it->pHorse!=nullptr);
+		if(it->pHorse!=nullptr && it->pHorse->isSleeping())
 		{
 			nbHorseInTheBox++;
 		}

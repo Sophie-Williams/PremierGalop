@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 		result = board.playOneTurnRequest(pPlayer,horseTargetCaseList, die);
 		if(result)
 		{
-			assert(pPlayer!=NULL);
+			assert(pPlayer!=nullptr);
 			board.displayLeftPannel(pPlayer->getTypeOfPlayer(),
 				pPlayer->getNickname(),
 				die,
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
 				//cout << "\t Cheval : " << it->pHorse->getHorseNumber() 
 				//	 << "\t Localisation:" << it->pTargetCase->getLocalization()	<< endl ;
 			//}
-			tHorseTargetCase horseTargetCase = {0};
+			tHorseTargetCase horseTargetCase = {nullptr, CASE_ID_UNKNOWN};
 			if(horseTargetCaseList.size() == 0)
 			{
 				//cout << "Zut <<" << pPlayer->getNickname() <<">>, tu ne peux pas bouger de chevaux" << endl;
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
 			caseListwhichNeedGraphicalUpdate.clear();
 			if(horseTargetCaseList.size()>=1)
 			{//update graphic board when a horse is moved!
-				if(horseTargetCase.pHorse!=NULL && Case::isValidCaseId(horseTargetCase.pTargetCase))
+				if(horseTargetCase.pHorse!=nullptr && Case::isValidCaseId(horseTargetCase.pTargetCase))
 				{
 					if(horseTargetCase.pHorse->isRunning())
 					{
@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
 				}
 			}
 			result = board.playOneTurnResponse(horseTargetCase.pHorse,horseTargetCase.pTargetCase,die,pPlayer);
-			if(pPlayer!=NULL && pPlayer==board.getPlayer(0) && die!=board.getMaxLadderCaseValue())
+			if(pPlayer!=nullptr && pPlayer==board.getPlayer(0) && die!=board.getMaxLadderCaseValue())
 			{
 				std::vector<int> scores = board.getScores();
 				board.storeAndReduceScores(currentTurn,800,scores);
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
 			{
 				result = board.displayBoard(caseListwhichNeedGraphicalUpdate);
 			}
-			if(pPlayer == NULL)
+			if(pPlayer == nullptr)
 			{
 				cout << "Le jeu est fini!" << endl;
 				board.displayHistoric();

@@ -70,12 +70,12 @@ private:
 	unsigned int m_ladderValue;
 	//caseValue is the char value read from the board topology file for the case.
 	char m_caseValue;
-	//logical localization is the localization in the topology file for the case
-	LogicalLocalization m_logicalLocalization;
 	//a case id should be used for referencing the case 
 	tCaseId m_id;
 	//keep a pointer on the board
 	Board * m_pBoard;
+        //logical localization is the localization in the topology file for the case
+	LogicalLocalization m_logicalLocalization;
 };
 
 #endif
