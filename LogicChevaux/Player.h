@@ -25,9 +25,9 @@ public:
 
 	Horse* getHorse(unsigned int nb);
 	unsigned int getHorseNumber(const Horse *horse);
-	unsigned int getPlayerNb();
+	unsigned int getPlayerNb() const;
 
-	unsigned char getPlayerId();
+	unsigned char getPlayerId() const;
 	std::string& getNickname();
 	void setNickname(const std::string& nickname);
 

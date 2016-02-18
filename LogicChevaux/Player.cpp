@@ -59,12 +59,12 @@ unsigned int Player::getHorseNumber(const Horse *horse)
 	return static_cast<unsigned int>(~0);//invalid value
 }
 
-unsigned int Player::getPlayerNb()
+unsigned int Player::getPlayerNb() const
 {
 	return m_playerId - 'a';
 }
 
-unsigned char Player::getPlayerId()
+unsigned char Player::getPlayerId() const
 {
 	return m_playerId;
 }

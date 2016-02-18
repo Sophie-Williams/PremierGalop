@@ -6,94 +6,77 @@
 #include "types.h"
 #include "Board.h"
 #include "LogicalLocalization.h"
-	
+
 struct SDL_Window;
 struct SDL_Texture;
 struct SDL_Renderer;
-typedef struct _TTF_Font TTF_Font;
+using TTF_Font = struct _TTF_Font;
 
-typedef enum 
-{
-	red, green, blue, yellow
-} tPlayerColor;
-
-const static std::string gfxfontFile = "../gfx/LiberationSansNarrow-Bold.ttf";
-
-const static std::string gfxBackGroundFile = "../gfx/Background.png";
-
-const static std::string gfxNormalCaseFile = "../gfx/NormalCase.png";
-
-#define MAX_LADDER_DIGIT 9
-
-static std::string gfxHorseFiles[]=
-{
-	"../gfx/RedHorse.png",
-	"../gfx/GreenHorse.png",
-	"../gfx/BlueHorse.png",
-	"../gfx/YellowHorse.png"
+using tPlayerColor = enum {
+    red, green, blue, yellow
 };
 
-typedef std::vector<SDL_Texture*> tpTextureList;
-typedef std::vector<tpTextureList> tpTextureListList;
+using tpTextureList = std::vector<SDL_Texture*>;
+using tpTextureListList = std::vector<tpTextureList>;
+using tSize = struct {
+    int w;
+    int h;
+};
 
-typedef struct {int w; int h;} tSize;
-
-class GfxBoard : public Board
-{
+class GfxBoard : public Board {
 public:
-	GfxBoard(U32 nbHorses=100, U16 screensizeX=800, U16 screensizeY=600);
-	virtual ~GfxBoard(void);
-	virtual bool ReadBoardTopologyFromTable(unsigned int maxLength);
-	virtual bool displayBoard(tpCaseList &caseList);
-	virtual bool displayBoard();
-	virtual void displayLeftPannel(std::string human, std::string nickname, int die, std::vector<int> scores, int horsesInTheBox, int iColor);
-	virtual bool GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int &nbPlayer);
+    GfxBoard(U32 nbHorses = 100, U16 screensizeX = 800, U16 screensizeY = 600) noexcept;
+    virtual ~GfxBoard(void) noexcept;
+    virtual bool ReadBoardTopologyFromTable(unsigned int maxLength) noexcept override;
+    virtual bool displayBoard(tpCaseList &caseList) noexcept;
+    virtual bool displayBoard() noexcept override;
+    virtual void displayLeftPannel(std::string human, std::string nickname, int die, std::vector<int> scores, int horsesInTheBox, int iColor) noexcept;
+    virtual bool GetChoiceFromEvents(eUserEventType &userEvent, int &nbHorse, int &nbPlayer) noexcept override;
 
 private:
-	void InitSidePanel();
-	bool LoadHorsesBitmap(const std::string& file);
-	SDL_Texture * LoadTexture(const std::string& file);
-	bool BuildStartCaseBitmap();
-	bool BuildLadderCaseBitmap();
-	//void DrawPixel(int x, int y, U8 R, U8 G, U8 B);
-	void ShowBMP(SDL_Texture* image,int x, int y);
-	bool ComputeGfxCoordinate();
-	bool ConvertLogicalToGfxCoordinate(LogicalLocalization &logicLoc, S32 &x, S32 &y, U16 &sizeX, U16 &sizeY);
-	bool ConvertGfxToLogicalCoordinate(S32 x, S32 y, LogicalLocalization &logicLoc);
-	
-	void blitHumanLabel(std::string &human, int iColor);
-	void blitNickLabel(std::string &nickname, int iColor);
-	void blitDieLabel(int die, int iColor);
-	void blitScoreLabel(std::vector<int> scores);
-	void blitBoxLabel(int horsesInTheBox, int iColor);
+    void InitSidePanel() noexcept;
+    bool LoadHorsesBitmap(const std::string& file) noexcept;
+    SDL_Texture * LoadTexture(const std::string& file) noexcept;
+    bool BuildStartCaseBitmap() noexcept;
+    bool BuildLadderCaseBitmap() noexcept;
+    void ShowBMP(SDL_Texture* image, int x, int y) noexcept;
+    bool ComputeGfxCoordinate() noexcept;
+    bool ConvertLogicalToGfxCoordinate(LogicalLocalization &logicLoc, S32 &x, S32 &y, U16 &sizeX, U16 &sizeY) noexcept;
+    bool ConvertGfxToLogicalCoordinate(S32 x, S32 y, LogicalLocalization &logicLoc) noexcept;
 
-	static TTF_Font * LoadFont(const std::string& file, int size);
+    void blitHumanLabel(std::string &human, int iColor) noexcept;
+    void blitNickLabel(std::string &nickname, int iColor) noexcept;
+    void blitDieLabel(int die, int iColor) noexcept;
+    void blitScoreLabel(std::vector<int> scores) noexcept;
+    void blitBoxLabel(int horsesInTheBox, int iColor) noexcept;
 
-	int getTextureW(SDL_Texture *pTexture);
-	int getTextureH(SDL_Texture *pTexture);
+    static TTF_Font * LoadFont(const std::string& file, int size) noexcept;
+
+    int getTextureW(SDL_Texture *pTexture) noexcept;
+    int getTextureH(SDL_Texture *pTexture) noexcept;
 
 private:
-	SDL_Window *m_wnd;
-	SDL_Renderer *m_renderer;
-	tpTextureList m_horseImages;
-	SDL_Texture *m_normalCaseImage;
-	tpTextureList m_startCaseImages;
-	tpTextureListList m_playerladderImages;
+    SDL_Window *m_wnd;
+    SDL_Renderer *m_renderer;
+    tpTextureList m_horseImages;
+    SDL_Texture *m_normalCaseImage;
+    tpTextureList m_startCaseImages;
+    tpTextureListList m_playerladderImages;
 
-	SDL_Texture * m_HumanPanelTexture;
-	SDL_Texture * m_NickPanelTexture;
-	SDL_Texture * m_DiePanelTexture;
-	SDL_Texture * m_ScorePanelTexture;
-	SDL_Texture * m_BoxPanelTexture;
+    SDL_Texture * m_HumanPanelTexture;
+    SDL_Texture * m_NickPanelTexture;
+    SDL_Texture * m_DiePanelTexture;
+    SDL_Texture * m_ScorePanelTexture;
+    SDL_Texture * m_BoxPanelTexture;
 
-	TTF_Font *m_pFont;
-	TTF_Font *m_pLittleFont;
-	U16 m_screensizeX; //TODO : change to tSize!!!!
-	U16 m_screensizeY;
-	U16 m_gridCaseSizeX;//TODO : change to tSize!!!!
-	U16 m_gridCaseSizeY;
+    TTF_Font *m_pFont;
+    TTF_Font *m_pLittleFont;
+    U16 m_screensizeX; //TODO : change to tSize!!!!
+    U16 m_screensizeY;
+    U16 m_gridCaseSizeX; //TODO : change to tSize!!!!
+    U16 m_gridCaseSizeY;
 
-	int m_sidePanelPositionX;
+    int m_sidePanelPositionX;
 };
 
 #endif

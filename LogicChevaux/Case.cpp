@@ -158,18 +158,18 @@ bool Case::moveFrom(tCaseId pCaseSource, Horse* pHorse)
 	}
 }
 
-bool Case::appendBaseLadderForPlayer(Player* player)
+bool Case::appendBaseLadderForPlayer(const Player* player)
 {
-	std::pair< std::set<Player *>::iterator, bool > pr = m_PlayerNumberBaseLadder.insert(player);
+	auto&& pr = m_PlayerNumberBaseLadder.insert(player);
 	return pr.second;
 }
 
-bool Case::isALadderForPlayer(Player* pPlayer) const
+bool Case::isALadderForPlayer(const Player* pPlayer) const
 {
 	return m_PlayerNumberBaseLadder.find(pPlayer) != m_PlayerNumberBaseLadder.end();
 }
 
-bool Case::isAStartCaseForPlayer(Player* pPlayer) const
+bool Case::isAStartCaseForPlayer(const Player* pPlayer) const
 {
 	if(pPlayer!=nullptr)
 	{

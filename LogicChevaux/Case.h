@@ -24,9 +24,9 @@ public:
 	bool getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsigned int level=0) const;
 	bool moveFrom(tCaseId pCaseSource, Horse* pHorse);
 
-	bool appendBaseLadderForPlayer(Player *player);
-	bool isAStartCaseForPlayer(Player* pPlayer) const;
-	bool isALadderForPlayer(Player* pPlayer) const;
+	bool appendBaseLadderForPlayer(const Player *player);
+	bool isAStartCaseForPlayer(const Player* pPlayer) const;
+	bool isALadderForPlayer(const Player* pPlayer) const;
 	bool isAStartCaseForHorse(Horse* pHorse) const;
 	bool isALadderForHorse(Horse* pHorse) const;
 	bool copyLadderSet(const tCaseId sourceCase);
@@ -59,7 +59,7 @@ private:
 	void setHorse(Horse* horse);
 
 private:
-	std::set<Player*> m_PlayerNumberBaseLadder;
+	std::set<const Player*> m_PlayerNumberBaseLadder;
 	//next case in the normal case
 	tCaseId m_pNextCase;
 	//next case in the ladder case
