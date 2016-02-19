@@ -5,10 +5,11 @@
 #include "PlayerInterface.h"
 
 class AllHorseAIPlayerImpl :
-	public PlayerInterface
-{
+public PlayerInterface {
 public:
-	AllHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: max chevaux", pBoard) {};
-	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
+
+    AllHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: max chevaux", pBoard) {
+    };
+    virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
 };
 #endif
