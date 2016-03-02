@@ -61,13 +61,13 @@ private:
 private:
 	std::set<const Player*> m_PlayerNumberBaseLadder;
 	//next case in the normal case
-	tCaseId m_pNextCase;
+	tCaseId m_pNextCase = CASE_ID_UNKNOWN;
 	//next case in the ladder case
-	tCaseId m_pNextLadderCase;
+	tCaseId m_pNextLadderCase = CASE_ID_UNKNOWN;
 	//Horse of player x is occupying the place
-	Horse * m_pHorse;
+	Horse * m_pHorse = nullptr;
 	//if the case is a ladder, it needs a specific value for moving on horse on it.
-	unsigned int m_ladderValue;
+	unsigned int m_ladderValue = 0;
 	//caseValue is the char value read from the board topology file for the case.
 	char m_caseValue;
 	//a case id should be used for referencing the case 

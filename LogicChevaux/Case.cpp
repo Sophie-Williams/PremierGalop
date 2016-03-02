@@ -5,15 +5,11 @@
 #include "Board.h"
 
 Case::Case(Board * pBoard, unsigned int x, unsigned int y, tCaseId id, char caseValue)
-: m_pNextCase(CASE_ID_UNKNOWN), m_pNextLadderCase(CASE_ID_UNKNOWN), m_pHorse(nullptr),
-m_ladderValue(0), m_caseValue(caseValue), m_id(id), m_pBoard(pBoard),
-m_logicalLocalization(x, y) {
+: m_caseValue(caseValue), m_id(id), m_pBoard(pBoard), m_logicalLocalization(x, y) {
 }
 
 Case::Case(Board * pBoard, const LogicalLocalization &localization, tCaseId id, char caseValue)
-: m_pNextCase(CASE_ID_UNKNOWN), m_pNextLadderCase(CASE_ID_UNKNOWN), m_pHorse(nullptr),
-m_ladderValue(0), m_caseValue(caseValue), m_id(id), m_pBoard(pBoard),
-m_logicalLocalization(localization) {
+: m_caseValue(caseValue), m_id(id), m_pBoard(pBoard), m_logicalLocalization(localization) {
 }
 
 bool Case::getPossibleMoves(Horse* horse, tMapDieNumberCase &outputMoves, unsigned int level) const {

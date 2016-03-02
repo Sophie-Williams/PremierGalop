@@ -4,11 +4,12 @@
 #include "PlayerInterface.h"
 
 class OneHorseAIPlayerImpl :
-	public PlayerInterface
-{
+public PlayerInterface {
 public:
-	OneHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: un cheval", pBoard) {};
-	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
+
+    OneHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: un cheval", pBoard) {
+    };
+    virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
 };
 
 #endif

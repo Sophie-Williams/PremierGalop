@@ -6,42 +6,43 @@
 #include "types.h"
 #include "Horse.h"
 
-typedef char tPLayerId;
-typedef std::vector<Horse> tHorseList;
+using tPLayerId = char;
+using tHorseList = std::vector<Horse>;
 
 class PlayerInterface;
 class Board;
 
-class Player
-{
+class Player {
 public:
-	Player(const std::string &nickname, tPLayerId playerId);
+    Player(const std::string &nickname, tPLayerId playerId);
 
-	bool AddHorses(Board * pBoard, unsigned int nbHorses);
-	void setPlayerInterface(PlayerInterface *pPlayerInterface);
+    bool AddHorses(Board * pBoard, unsigned int nbHorses);
+    void setPlayerInterface(PlayerInterface *pPlayerInterface);
 
-	tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
-	std::string getTypeOfPlayer();
+    tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
+    std::string getTypeOfPlayer();
 
-	Horse* getHorse(unsigned int nb);
-	unsigned int getHorseNumber(const Horse *horse);
-	unsigned int getPlayerNb() const;
+    Horse* getHorse(unsigned int nb);
+    unsigned int getHorseNumber(const Horse *horse) const;
+    unsigned int getPlayerNb() const;
 
-	unsigned char getPlayerId() const;
-	std::string& getNickname();
-	void setNickname(const std::string& nickname);
+    unsigned char getPlayerId() const;
+    const std::string& getNickname() const;
+    void setNickname(const std::string& nickname);
 
-	bool hasAlreadyWon();
-	int getScore() const;
+    bool hasAlreadyWon() const;
+    int getScore() const;
 
-	inline bool isExitRequested() {return m_exitRequest;};
+    inline bool isExitRequested() {
+        return m_exitRequest;
+    };
 
 private:
-	tHorseList m_horses;
-	tPLayerId m_playerId;
-	std::string m_nickname;
-	PlayerInterface * m_pPlayerInterface;//Pointer is necessary, in order to prevent truncation.
-	bool m_exitRequest;
+    tHorseList m_horses;
+    tPLayerId m_playerId;
+    std::string m_nickname;
+    PlayerInterface * m_pPlayerInterface = nullptr; //Pointer is necessary, in order to prevent truncation.
+    bool m_exitRequest = false;
 };
 
 #endif

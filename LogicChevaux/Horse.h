@@ -5,39 +5,38 @@
 
 class Player;
 
-class Horse
-{
+class Horse {
 public:
-	Horse(Board * pBoard, Player * player);
-	Player * getPlayer() const;
-	tCaseId getCase() const;
-	unsigned int getHorseNumber() const;
-	void setCase(tCaseId pCaseToSet);
-	bool haveSamePlayerOwner(const Horse *horse) const;
+    Horse(Board * pBoard, Player * player);
+    Player * getPlayer() const;
+    tCaseId getCase() const;
+    unsigned int getHorseNumber() const;
+    void setCase(tCaseId pCaseToSet);
+    bool haveSamePlayerOwner(const Horse *horse) const;
 
-	bool isSleeping() const;
-	bool isArrived() const;
-	bool isRunning() const;
-	bool isRunningOnNormalCase() const;
-	bool isRunningOnLadderCase() const;
-	bool isRunningOnfirstCaseofLadderCase() const;
+    bool isSleeping() const;
+    bool isArrived() const;
+    bool isRunning() const;
+    bool isRunningOnNormalCase() const;
+    bool isRunningOnLadderCase() const;
+    bool isRunningOnfirstCaseofLadderCase() const;
 
-	void returnToSleepingBox();
-	void setArrivedState();
+    void returnToSleepingBox();
+    void setArrivedState();
 
-	bool operator==(const Horse &horse) const;
+    bool operator==(const Horse &horse) const;
 
-	int getScore() const;
-	void resetScore();
-	void incrementScore(int increment);
+    int getScore() const;
+    void resetScore();
+    void incrementScore(int increment);
 
 private:
-	Player * m_pPlayer;
-	tCaseId m_pCase;
-	bool m_bIsArrived;
+    Player * m_pPlayer;
+    tCaseId m_pCase = CASE_ID_UNKNOWN;
+    bool m_bIsArrived = false;
 
-	int m_score;
-	Board * m_pBoard;
+    int m_score = 0;
+    Board * m_pBoard;
 };
 
 #endif

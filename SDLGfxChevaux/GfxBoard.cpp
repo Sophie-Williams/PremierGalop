@@ -102,8 +102,8 @@ GfxBoard::GfxBoard(U32 nbHorses, U16 screensizeX, U16 screensizeY) noexcept : Bo
 TTF_Font * GfxBoard::LoadFont(const std::string& file, int size) noexcept {
     TTF_Font* pOutputFont = TTF_OpenFont(file.c_str(), size);
     if ((pOutputFont == nullptr)
-            && (file.length() + 1 > sizeof (STR_PARENT_DIRECTORY))) {
-        pOutputFont = TTF_OpenFont(file.c_str() + sizeof (STR_PARENT_DIRECTORY) - 1, size);
+            && (file.length() > STR_PARENT_DIRECTORY.length())) {
+        pOutputFont = TTF_OpenFont(file.substr(STR_PARENT_DIRECTORY.length()).c_str(), size);
     }
     return pOutputFont;
 }
@@ -140,8 +140,8 @@ SDL_Texture * GfxBoard::LoadTexture(const std::string& file) noexcept {
     SDL_Surface *image = IMG_Load(file.c_str()); //Can load many type of files!
     SDL_Texture *texture = nullptr;
     if ((image == nullptr)
-            && (file.length() + 1 > sizeof (STR_PARENT_DIRECTORY))) {
-        image = IMG_Load(file.c_str() + sizeof (STR_PARENT_DIRECTORY) - 1);
+            && (file.length() > STR_PARENT_DIRECTORY.length())) {
+        image = IMG_Load(file.substr(STR_PARENT_DIRECTORY.length()).c_str());
         if (image == nullptr) {
             std::cerr << "Impossible de charger " << file.c_str() << ":" << SDL_GetError() << std::endl;
         } else {

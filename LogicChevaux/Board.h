@@ -93,10 +93,10 @@ private:
     tpCaseList m_endcases;
     //list of all players
     tPlayerList m_players;
-    unsigned int m_maxladderCaseValue;
+    unsigned int m_maxladderCaseValue = 0;
 
     tHistoricList m_historicScores;
-    unsigned int m_timeScoreResolution;
+    unsigned int m_timeScoreResolution = 1;
 };
 
 #endif

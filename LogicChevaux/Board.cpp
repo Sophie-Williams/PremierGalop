@@ -11,7 +11,7 @@
 #include "Player.h"
 #include "FileUtility.h"
 
-Board::Board(U32 nbHorses) : m_nbHorses(nbHorses), m_maxladderCaseValue(0), m_timeScoreResolution(1) {
+Board::Board(U32 nbHorses) : m_nbHorses(nbHorses) {
     srand((unsigned) time(nullptr));
 }
 

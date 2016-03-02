@@ -15,16 +15,17 @@ typedef signed long S32;
 #include "Case.h"
 class Horse;
 
-typedef struct
-{
-	Horse * pHorse;
-	tCaseId pTargetCase;
-} tHorseTargetCase;
+using tHorseTargetCase = struct sHorseTargetCase {
+    Horse * pHorse;
+    tCaseId pTargetCase;
+};
 
-const tHorseTargetCase ASK_QUIT = {nullptr,CASE_ID_UNKNOWN};
+const tHorseTargetCase ASK_QUIT = {nullptr, CASE_ID_UNKNOWN};
 
-#define mHorseTargetCaseEquals(a,b) (((a).pHorse==(b).pHorse) && ((a).pTargetCase.id==(b).pTargetCase.id))
+inline bool mHorseTargetCaseEquals(const tHorseTargetCase& a, const tHorseTargetCase& b) {
+    return a.pHorse==b.pHorse && a.pTargetCase.id==b.pTargetCase.id;
+}
 
-typedef std::list<tHorseTargetCase> tHorseTargetCaseList;
+using tHorseTargetCaseList = std::list<tHorseTargetCase>;
 
 #endif

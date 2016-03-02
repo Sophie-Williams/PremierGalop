@@ -4,17 +4,21 @@
 #include <string>
 #include "Board.h"
 
-class PlayerInterface
-{
+class PlayerInterface {
 protected:
-	PlayerInterface(const std::string &sAiType, Board *pBoard) : m_sAiType(sAiType), m_pBoard(pBoard) {};
+
+    PlayerInterface(const std::string &sAiType, Board *pBoard) : m_sAiType(sAiType), m_pBoard(pBoard) {
+    };
 public:
-	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves) = 0;
-	virtual std::string& getTypeOfPlayer() { return m_sAiType;};
+    virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves) = 0;
+
+    virtual std::string& getTypeOfPlayer() {
+        return m_sAiType;
+    };
 private:
-	std::string m_sAiType;
+    std::string m_sAiType;
 protected:
-	Board * m_pBoard;
+    Board * m_pBoard;
 };
 
 #endif

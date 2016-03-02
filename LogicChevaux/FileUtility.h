@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 
-#define STR_PARENT_DIRECTORY "../"
+const std::string STR_PARENT_DIRECTORY = "../";
 
 bool tryToLoadFromParentDirectory(std::ifstream& inputFile, const std::string& file);
 

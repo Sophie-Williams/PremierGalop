@@ -4,99 +4,82 @@
 #include "PlayerInterface.h"
 
 Player::Player(const std::string &nickname, tPLayerId playerId)
-: m_playerId(playerId), m_nickname(nickname), m_pPlayerInterface(nullptr), m_exitRequest(false)
-{}
-
-bool Player::AddHorses(Board * pBoard, unsigned int nbHorses)
-{
-	assert(pBoard!=nullptr);
-	for(unsigned int i=0; i<nbHorses; i++)
-	{
-		m_horses.push_back(Horse(pBoard, this));
-	}
-	return true;
+: m_playerId(playerId), m_nickname(nickname) {
 }
 
-void Player::setPlayerInterface(PlayerInterface *pPlayerInterface)
-{
-	m_pPlayerInterface = pPlayerInterface;
+bool Player::AddHorses(Board * pBoard, unsigned int nbHorses) {
+    assert(pBoard != nullptr);
+    for (unsigned int i = 0; i < nbHorses; i++) {
+        m_horses.push_back(Horse(pBoard, this));
+    }
+    return true;
 }
 
-tHorseTargetCase Player::ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves)
-{
-	tHorseTargetCase htc;
-	assert(m_pPlayerInterface!=nullptr);
-	htc = m_pPlayerInterface->ChooseMoveFrom(listOfMoves);
-	if(mHorseTargetCaseEquals(htc,ASK_QUIT))
-		m_exitRequest = true;
-	return htc;
+void Player::setPlayerInterface(PlayerInterface *pPlayerInterface) {
+    m_pPlayerInterface = pPlayerInterface;
 }
 
-std::string Player::getTypeOfPlayer()
-{
-	assert(m_pPlayerInterface!=nullptr);
-	return m_pPlayerInterface->getTypeOfPlayer();
+tHorseTargetCase Player::ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves) {
+    tHorseTargetCase htc;
+    assert(m_pPlayerInterface != nullptr);
+    htc = m_pPlayerInterface->ChooseMoveFrom(listOfMoves);
+    if (mHorseTargetCaseEquals(htc, ASK_QUIT))
+        m_exitRequest = true;
+    return htc;
 }
 
-Horse* Player::getHorse(unsigned int nb)
-{
-	assert(nb<m_horses.size());
-	return &m_horses[nb];
+std::string Player::getTypeOfPlayer() {
+    assert(m_pPlayerInterface != nullptr);
+    return m_pPlayerInterface->getTypeOfPlayer();
 }
 
-unsigned int Player::getHorseNumber(const Horse *horse)
-{
-	if(horse!=nullptr)
-	{
-		for(tHorseList::iterator it = m_horses.begin(); it != m_horses.end(); it++)
-		{
-			if(horse==&*it)
-			{
-				return static_cast<unsigned int>(it-m_horses.begin());//return index of horse in the m_horses vector
-			}
-		}
-	}
-	return static_cast<unsigned int>(~0);//invalid value
+Horse* Player::getHorse(unsigned int nb) {
+    assert(nb < m_horses.size());
+    return &m_horses[nb];
 }
 
-unsigned int Player::getPlayerNb() const
-{
-	return m_playerId - 'a';
+unsigned int Player::getHorseNumber(const Horse *horse) const {
+    if (horse != nullptr) {
+        unsigned int horseNumber = 0;
+        for (const auto& horseItem : m_horses) {
+            if (horse == &horseItem) {
+                return horseNumber; //return index of horse in the m_horses vector
+            }
+            horseNumber++;
+        }
+    }
+    return static_cast<unsigned int> (~0); //invalid value
 }
 
-unsigned char Player::getPlayerId() const
-{
-	return m_playerId;
+unsigned int Player::getPlayerNb() const {
+    return m_playerId - 'a';
 }
 
-std::string& Player::getNickname()
-{
-	return m_nickname;
+unsigned char Player::getPlayerId() const {
+    return m_playerId;
 }
 
-void Player::setNickname(const std::string& nickname)
-{
-	m_nickname = nickname;
+const std::string& Player::getNickname() const {
+    return m_nickname;
 }
 
-bool Player::hasAlreadyWon()
-{
-	for(tHorseList::const_iterator it=m_horses.begin(); it != m_horses.end(); it++)
-	{
-		if(!it->isArrived())
-		{
-			return false;
-		}
-	}
-	return true;
+void Player::setNickname(const std::string& nickname) {
+    m_nickname = nickname;
 }
 
-int Player::getScore() const
-{
-	int score = 0;
-	for(tHorseList::const_iterator it=m_horses.begin(); it != m_horses.end(); it++)
-	{
-		score+=it->getScore();
-	}
-	return score;
+bool Player::hasAlreadyWon() const {
+    for (const auto& horse : m_horses) {
+        if (!horse.isArrived()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int Player::getScore() const {
+    int score = 0;
+    for (const auto& horse : m_horses) {
+        score += horse.getScore();
+    }
+    return score;
 }

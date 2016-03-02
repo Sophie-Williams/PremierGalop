@@ -3,11 +3,12 @@
 #include "PlayerInterface.h"
 
 class HumanPlayerImpl :
-	public PlayerInterface
-{
+public PlayerInterface {
 public:
-	HumanPlayerImpl(Board * pBoard) :  PlayerInterface("Humain", pBoard) {};
-	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
+
+    HumanPlayerImpl(Board * pBoard) : PlayerInterface("Humain", pBoard) {
+    };
+    virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
 };
 
 #endif

@@ -5,10 +5,11 @@
 #include "PlayerInterface.h"
 
 class SmartHorseAIPlayerImpl :
-	public PlayerInterface
-{
+public PlayerInterface {
 public:
-	SmartHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: chevaux intelligents", pBoard) {};
-	virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
+
+    SmartHorseAIPlayerImpl(Board *pBoard) : PlayerInterface("IA: chevaux intelligents", pBoard) {
+    };
+    virtual tHorseTargetCase ChooseMoveFrom(const tHorseTargetCaseList &listOfMoves);
 };
 #endif
